@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
 
 class BaseService
@@ -13,9 +14,11 @@ class BaseService
         $this->model = $model;
     }
 
-    public function getAll()
+    public function getAll($perPage = 10, $filters = []): Paginator
     {
-        return $this->model->all();
+        $query = $this->model->query();
+
+        return $this->model->paginate($perPage);
     }
 
     public function getById($id)

@@ -2,22 +2,23 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Post;
+use App\Models\Comment;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        Post::factory(100)->create();
+        
+        for ($i = 0; $i < 300; $i++) {
+            Comment::factory()->create([
+                'user_id' => User::inRandomOrder()->first()->id,
+                'post_id' => Post::inRandomOrder()->first()->id,
+            ]);
+        }
     }
 }
