@@ -1,10 +1,9 @@
 <?php
 
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\PostController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,3 +28,7 @@ Route::get('/courses/{id}', [CourseController::class, 'show'])->name('course.sho
 Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
 Route::put('/courses/{id}', [CourseController::class, 'update'])->name('courses.update');
 Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
+
+Route::get('/debug-sentry', function () {
+    throw new Exception('My first Sentry error!');
+});

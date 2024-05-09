@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PostService;
 use Illuminate\Http\Request;
-use App\Models\Post;
 
 class PostController extends Controller
 {
+    private $postService;
+
+    public function __construct(PostService $postService)
+    {
+        $this->postService = $postService;
+    }
+
     public function index()
     {
-        $posts = Post::all();
+        $posts = $this->postService->getAll();
+
         return view('posts.index', compact('posts'));
     }
 
@@ -22,19 +30,22 @@ class PostController extends Controller
 
         $validatedData['user_id'] = 1;
 
-        Post::create($validatedData);
+        $this->postService->create($validatedData);
+
         return redirect()->route('posts.index');
     }
 
     public function show($id)
     {
-        $post = Post::findOrFail($id);
+        $post = $this->postService->getById($id);
+
         return view('posts.show', compact('post'));
     }
 
     public function edit($id)
     {
-        $post = Post::findOrFail($id);
+        $post = $this->postService->getById($id);
+
         return view('posts.edit', compact('post'));
     }
 
@@ -45,15 +56,15 @@ class PostController extends Controller
             'content' => 'required',
         ]);
 
-        $post = Post::findOrFail($id);
-        $post->update($validatedData);
+        $this->postService->update($id, $validatedData);
+
         return redirect()->route('posts.index');
     }
 
     public function destroy($id)
     {
-        $post = Post::findOrFail($id);
-        $post->delete();
+        $this->postService->delete($id);
+
         return redirect()->route('posts.index');
     }
 }

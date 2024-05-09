@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CommentService;
 use Illuminate\Http\Request;
-use App\Models\Comment;
 
 class CommentController extends Controller
 {
+    private $commentService;
+
+    public function __construct(CommentService $commentService)
+    {
+        $this->commentService = $commentService;
+    }
+
     public function index()
     {
-        $comments = Comment::all();
+        $commnet = $this->commentService->getAll();
+
         return view('comments.index', compact('comments'));
     }
 
@@ -19,11 +27,12 @@ class CommentController extends Controller
             'content' => 'required',
             'post_id' => 'required',
         ]);
-        
+
         $validatedData['user_id'] = 1;
 
-        Comment::create($validatedData);
-        return redirect()->route('posts.show',  $validatedData['post_id']);
+        $this->commentService->create($validatedData);
+
+        return redirect()->route('posts.show', $validatedData['post_id']);
     }
 
     public function update(Request $request, $id)
@@ -32,16 +41,15 @@ class CommentController extends Controller
             'content' => 'required',
         ]);
 
-        $comment = Comment::findOrFail($id);
-        $comment->update($validatedData);
+        $comment = $this->commentService->update($id, $validatedData);
+
         return redirect()->route('posts.show', $comment->post_id);
     }
 
     public function destroy($id)
     {
-        $comment = Comment::findOrFail($id);
-        $postId = $comment->post_id;
-        $comment->delete();
-        return redirect()->route('posts.show', $postId);
+        $this->commentService->delete($id);
+
+        return redirect()->route('posts.index');
     }
 }
