@@ -34,3 +34,4 @@ Route::controller(CourseController::class)->prefix('courses')->group(function ()
     Route::put('/{id}', 'update')->name('courses.update');
     Route::delete('/{id}', 'destroy')->name('courses.destroy');
 });
+

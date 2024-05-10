@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Post extends Model
 {
@@ -41,5 +42,6 @@ class Post extends Model
         }
 
         return $query->where('user_id', '>', $authorId);
+
     }
 }
