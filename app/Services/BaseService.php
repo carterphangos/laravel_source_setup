@@ -14,11 +14,19 @@ class BaseService
         $this->model = $model;
     }
 
-    public function getAll($perPage = 10, $filters = []): Paginator
+    public function getAll($perPage = 10, $query, $sortColumn = 'created_at', $sortOrder = 'desc', $columnSearch = null, $termSearch = null): Paginator
     {
-        $query = $this->model->query();
+        $query->orderBy($sortColumn, $sortOrder);
 
-        return $this->model->paginate($perPage);
+        if ($termSearch && is_array($columnSearch)) {
+            $query->where(function ($subQuery) use ($columnSearch, $termSearch) {
+                foreach ($columnSearch as $column) {
+                    $subQuery->orWhere($column, 'like', "%$termSearch%");
+                }
+            });
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function getById($id)

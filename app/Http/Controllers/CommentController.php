@@ -14,9 +14,20 @@ class CommentController extends Controller
         $this->commentService = $commentService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $commnet = $this->commentService->getAll();
+        $perPage = $request->input('perPage', 10);
+
+        $filters = $request->except('page', 'perPage');
+        $filters = [
+            'postId' => $request->input('postId'),
+            'authorId' => $request->input('authorId'),
+            'sortColumn' => $request->input('sortColumn'),
+            'sortOrder' => $request->input('sortOrder'),
+            'termSearch' => $request->input('termSearch'),
+        ];
+
+        $comments = $this->commentService->getAllComments($perPage, $filters);
 
         return view('comments.index', compact('comments'));
     }

@@ -34,7 +34,6 @@
                     <tr>
                         <td>{{ $post->id }}</td>
                         <td><a href="{{ route('posts.show', $post->id) }}">{{ $post->title }}</a></td>
-
                         <td>{{ $post->content }}</td>
                         <td>{{ $post->user->name }}</td>
                         <td>{{ $post->created_at }}</td>
