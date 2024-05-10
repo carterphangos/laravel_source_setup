@@ -14,7 +14,7 @@ class BaseService
         $this->model = $model;
     }
 
-    public function getAll($perPage = 10, $query, $sortColumn = 'created_at', $sortOrder = 'desc', $columnSearch = null, $termSearch = null): Paginator
+    public function getAll($perPage, $query, $sortColumn = 'created_at', $sortOrder = 'desc', $columnSearch = null, $termSearch = null): Paginator
     {
         $query->orderBy($sortColumn, $sortOrder);
 

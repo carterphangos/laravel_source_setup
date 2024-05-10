@@ -3,12 +3,13 @@
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
 
 Route::controller(PostController::class)->prefix('posts')->group(function () {
     Route::get('/', 'index')->name('posts.index');
@@ -33,4 +34,8 @@ Route::controller(CourseController::class)->prefix('courses')->group(function ()
     Route::get('/{id}/edit', 'edit')->name('courses.edit');
     Route::put('/{id}', 'update')->name('courses.update');
     Route::delete('/{id}', 'destroy')->name('courses.destroy');
+});
+
+Route::prefix('users')->group(function () {
+    Route::get('/{id}', [UserController::class, 'show'])->name('users.show');
 });

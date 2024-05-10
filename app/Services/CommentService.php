@@ -7,8 +7,6 @@ use Illuminate\Contracts\Pagination\Paginator;
 
 class CommentService extends BaseService
 {
-    private $commentModel;
-
     public function __construct(Comment $comment)
     {
         parent::__construct($comment);
@@ -23,7 +21,7 @@ class CommentService extends BaseService
         $sortColumn = $filters['sortColumn'] ?? 'created_at';
         $sortOrder = $filters['sortOrder'] ?? 'desc';
 
-        $columnSearch = ['content'];
+        $columnSearch = config('constants.COMMENTS_COLUMNS');
 
         return $this->getAll($perPage, $query, $sortColumn, $sortOrder, $columnSearch, $filters['termSearch']);
     }
