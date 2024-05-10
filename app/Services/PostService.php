@@ -19,14 +19,4 @@ class PostService extends BaseService
         return $this->getAll($perPage, $filters);
     }
 
-    public function getFilteredPosts($perPage = 10, $filters = []): Paginator
-    {
-        $query = Post::query();
-
-        $commentCount = $filters['commentCount'] ?? null;
-
-        $query->has('comments', '>', $commentCount);
-
-        return $query->paginate($perPage);
-    }
 }
