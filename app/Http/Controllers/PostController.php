@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Services\PostService;
 use Illuminate\Http\Request;
 
-use function Ramsey\Uuid\v1;
-
 class PostController extends Controller
 {
     private $postService;
@@ -21,17 +19,15 @@ class PostController extends Controller
         $perPage = $request->input('perPage', 10);
         $filters = $request->except('page', 'perPage');
 
+        $filters = [
+            'commentCount' => $request->input('commentCount'),
+            'authorId' => $request->input('authorId'),
+            'sortColumn' => $request->input('sortColumn'),
+            'sortOrder' => $request->input('sortOrder'),
+            'termSearch' => $request->input('termSearch'),
+        ];
+
         $posts = $this->postService->getAllPosts($perPage, $filters);
-
-        return view('posts.index', compact('posts'));
-    }
-
-    public function filter(Request $request, $commentCount){
-        $perPage = $request->input('perPage', 10);
-        $filters = $request->except('page', 'perPage');
-        $filters['commentCount'] = $commentCount;
-
-        $posts = $this->postService->getFilteredPosts($perPage, $filters);
 
         return view('posts.index', compact('posts'));
     }

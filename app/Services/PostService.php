@@ -7,7 +7,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 
 class PostService extends BaseService
 {
-    private $postModel;
+    protected $post;
 
     public function __construct(Post $post)
     {
@@ -16,17 +16,15 @@ class PostService extends BaseService
 
     public function getAllPosts($perPage = 10, $filters = []): Paginator
     {
-        return $this->getAll($perPage, $filters);
-    }
+        $query = $this->model
+            ->hasManyComments($filters['commentCount'] ?? false)
+            ->AuthorIdGreaterThan($filters['authorId'] ?? false);
 
-    public function getFilteredPosts($perPage = 10, $filters = []): Paginator
-    {
-        $query = Post::query();
+        $sortColumn = $filters['sortColumn'] ?? 'created_at';
+        $sortOrder = $filters['sortOrder'] ?? 'desc';
 
-        $commentCount = $filters['commentCount'] ?? null;
+        $columnSearch = ['title'];
 
-        $query->has('comments', '>', $commentCount);
-
-        return $query->paginate($perPage);
+        return $this->getAll($perPage, $query, $sortColumn, $sortOrder, $columnSearch, $filters['termSearch']);
     }
 }

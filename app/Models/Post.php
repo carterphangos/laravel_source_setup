@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 
 class Post extends Model
 {
@@ -26,8 +25,21 @@ class Post extends Model
         return $this->hasMany(Comment::class);
     }
 
-    public function scopeHasManyComments($query)
+    public function scopeHasManyComments($query, $commentCount)
     {
-        return $query->has('comments', '>', 3);
+        if ($commentCount == false) {
+            return $query;
+        }
+
+        return $query->has('comments', '>', $commentCount);
+    }
+
+    public function scopeAuthorIdGreaterThan($query, $authorId)
+    {
+        if ($authorId == false) {
+            return $query;
+        }
+
+        return $query->where('user_id', '>', $authorId);
     }
 }
