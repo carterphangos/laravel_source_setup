@@ -24,7 +24,7 @@
         </nav>
     </header>
 
-    <main>
+    <main class="pb-5">
         @yield('content')
     </main>
 

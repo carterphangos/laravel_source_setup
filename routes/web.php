@@ -8,26 +8,36 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/hello', [PostController::class, 'hello'])->name('posts.hello');
 
-Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
-Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
-Route::get('/posts/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');
-Route::put('/posts/{id}', [PostController::class, 'update'])->name('posts.update');
-Route::delete('/posts/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
+Route::get('/hello', function () {
+    return "Hello World";
+});
 
-Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
-Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');
-Route::put('/comments/{id}', [CommentController::class, 'update'])->name('comments.update');
-Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
+Route::controller(PostController::class)->prefix('posts')->group(function () {
+    Route::get('/', 'index')->name('posts.index');
+    Route::get('/filter/{commentCount}', 'filter')->name('posts.filter');
+    Route::post('/', 'store')->name('posts.store');
+    Route::get('/{id}', 'show')->name('posts.show');
+    Route::get('/{id}/edit', 'edit')->name('posts.edit');
+    Route::put('/{id}', 'update')->name('posts.update');
+    Route::delete('/{id}', 'destroy')->name('posts.destroy');
+});
 
-Route::get('/courses', [CourseController::class, 'index'])->name('course.index');
-Route::post('/courses', [CourseController::class, 'store'])->name('course.store');
-Route::get('/courses/{id}', [CourseController::class, 'show'])->name('course.show');
-Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
-Route::put('/courses/{id}', [CourseController::class, 'update'])->name('courses.update');
-Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
+Route::controller(CommentController::class)->prefix('comments')->group(function () {
+    Route::post('/', 'store')->name('comments.store');
+    Route::get('/', 'index')->name('comments.index');
+    Route::put('/{id}', 'update')->name('comments.update');
+    Route::delete('/{id}', 'destroy')->name('comments.destroy');
+});
+
+Route::controller(CourseController::class)->prefix('courses')->group(function () {
+    Route::get('/', 'index')->name('course.index');
+    Route::post('/', 'store')->name('course.store');
+    Route::get('/{id}', 'show')->name('course.show');
+    Route::get('/{id}/edit', 'edit')->name('courses.edit');
+    Route::put('/{id}', 'update')->name('courses.update');
+    Route::delete('/{id}', 'destroy')->name('courses.destroy');
+});
 
 Route::get('/debug-sentry', function () {
     throw new Exception('My first Sentry error!');

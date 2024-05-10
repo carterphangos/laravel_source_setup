@@ -14,9 +14,12 @@ class PostController extends Controller
         $this->postService = $postService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $posts = $this->postService->getAll();
+        $perPage = $request->input('perPage', 10);
+        $filters = $request->except('page', 'perPage');
+
+        $posts = $this->postService->getAllPosts($perPage, $filters);
 
         return view('posts.index', compact('posts'));
     }
