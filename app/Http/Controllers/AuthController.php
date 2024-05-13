@@ -64,21 +64,7 @@ class AuthController extends Controller
     public function updatePasswordUser(UpdateUserRequest $request)
     {
         $user = auth()->user();
-
-        if ($request->email !== $user->email) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Email is incorrect.',
-            ], 400);
-        }
-
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Current password is incorrect.',
-            ], 400);
-        }
-
+    
         $user->update([
             'password' => Hash::make($request->new_password)
         ]);
