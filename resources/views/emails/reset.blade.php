@@ -37,6 +37,7 @@
         <p>You are receiving this email because we received a password reset request for your account.</p>
         <p>To reset your password, click the button below:</p>
         <a href="{{ $resetLink }}" class="btn">Reset Password</a>
+        <p>This password reset link will expire at {{ $expiresAt }}.</p>
         <p>If you did not request a password reset, no further action is required.</p>
         <p>Regards,<br>
         {{ config('app.name') }}</p>
