@@ -8,29 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\LoginUserRequest;
+
 
 class AuthController extends Controller
 {
-    public function registerUser(Request $request)
+    public function registerUser(RegisterUserRequest $request)
     {
         try {
-            $validateUser = Validator::make(
-                $request->all(),
-                [
-                    'name' => 'required',
-                    'email' => 'required|email|unique:users,email',
-                    'password' => 'required',
-                ]
-            );
-
-            if ($validateUser->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'validation error',
-                    'errors' => $validateUser->errors(),
-                ], 401);
-            }
-
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -50,25 +36,9 @@ class AuthController extends Controller
         }
     }
 
-    public function loginUser(Request $request)
+    public function loginUser(LoginUserRequest $request)
     {
         try {
-            $validateUser = Validator::make(
-                $request->all(),
-                [
-                    'email' => 'required|email',
-                    'password' => 'required',
-                ]
-            );
-
-            if ($validateUser->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'validation error',
-                    'errors' => $validateUser->errors(),
-                ], 401);
-            }
-
             if (! Auth::attempt($request->only(['email', 'password']))) {
                 return response()->json([
                     'status' => false,
