@@ -14,6 +14,12 @@ Route::controller(AuthController::class)->prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::controller(AuthController::class)->prefix('auth')->group(function () {
+        Route::post('/update', 'updatePasswordUser');
+    });
+});
+
+Route::middleware('auth:sanctum')->group(function () {
     Route::controller(PostController::class)->prefix('posts')->group(function () {
         Route::get('/', 'index')->name('posts.index');
         Route::post('/', 'store')->name('posts.store');

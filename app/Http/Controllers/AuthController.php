@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\LoginUserRequest;
-
+use App\Http\Requests\UpdateUserPasswordRequest;
 
 class AuthController extends Controller
 {
@@ -39,7 +39,7 @@ class AuthController extends Controller
     public function loginUser(LoginUserRequest $request)
     {
         try {
-            if (! Auth::attempt($request->only(['email', 'password']))) {
+            if (!Auth::attempt($request->only(['email', 'password']))) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Email & Password does not match with our record.',
@@ -59,5 +59,26 @@ class AuthController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function updatePasswordUser(UpdateUserPasswordRequest $request)
+    {
+        $user = auth()->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Current password is incorrect.',
+            ], 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password updated successfully.',
+        ], 200);
     }
 }
