@@ -7,8 +7,6 @@ use Illuminate\Contracts\Pagination\Paginator;
 
 class PostService extends BaseService
 {
-    protected $post;
-
     public function __construct(Post $post)
     {
         parent::__construct($post);
@@ -23,7 +21,7 @@ class PostService extends BaseService
         $sortColumn = $filters['sortColumn'] ?? 'created_at';
         $sortOrder = $filters['sortOrder'] ?? 'desc';
 
-        $columnSearch = ['title'];
+        $columnSearch = config('constants.POSTS_COLUMNS');
 
         return $this->getAll($perPage, $query, $sortColumn, $sortOrder, $columnSearch, $filters['termSearch']);
     }
