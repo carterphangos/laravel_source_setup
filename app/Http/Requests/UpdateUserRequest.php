@@ -6,11 +6,12 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateUserPasswordRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
+            'email' => 'required|email|unique:users,email',
             'current_password' => 'required',
             'new_password' => 'required|confirmed|min:8',
             'new_password_confirmation' => 'required'
