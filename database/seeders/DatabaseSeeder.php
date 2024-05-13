@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         Post::factory(100)->create();
+
         for ($i = 0; $i < 300; $i++) {
             Comment::factory()->create([
                 'user_id' => User::inRandomOrder()->first()->id,

@@ -13,7 +13,7 @@ class PostResource extends JsonResource
             'title' => $this->title,
             'content' => $this->content,
             'user' => new UserResource($this->user),
-            // 'comments' => new CommentResource($this->comments),
+            'comments' => CommentResource::collection($this->comments),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
