@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CommentCollection;
 use App\Http\Resources\PostCollection;
-use App\Models\User;
+use App\Models\Comment;
+use App\Models\Post;
 
 class UserController extends Controller
 {
     public function show($id)
     {
-        $user = User::findOrFail($id);
-        $posts = $user->posts;
-        $comments = $user->comments;
+        $posts = Post::with('user')->where('user_id', $id)->get();
+        $comments = Comment::with('user')->where('user_id', $id)->get();
 
         return response()->json([
             'posts' => new PostCollection($posts),

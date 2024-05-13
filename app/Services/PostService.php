@@ -18,11 +18,8 @@ class PostService extends BaseService
             ->hasManyComments($filters['commentCount'] ?? false)
             ->AuthorIdGreaterThan($filters['authorId'] ?? false);
 
-        $sortColumn = $filters['sortColumn'] ?? 'created_at';
-        $sortOrder = $filters['sortOrder'] ?? 'desc';
-
         $columnSearch = config('constants.POSTS_COLUMNS');
 
-        return $this->getAll($perPage, $query, $sortColumn, $sortOrder, $columnSearch, $filters['termSearch']);
+        return $this->getAll($perPage, $query, $filters, $columnSearch, $filters['termSearch']);
     }
 }

@@ -14,8 +14,11 @@ class BaseService
         $this->model = $model;
     }
 
-    public function getAll($perPage, $query, $sortColumn = 'created_at', $sortOrder = 'desc', $columnSearch = null, $termSearch = null): Paginator
+    public function getAll($perPage, $query, $filters = [], $columnSearch = null, $termSearch = null): Paginator
     {
+        $sortColumn = $filters['sortColumn'] ?? 'created_at';
+        $sortOrder = $filters['sortOrder'] ?? 'desc';
+
         $query->orderBy($sortColumn, $sortOrder);
 
         if ($termSearch && is_array($columnSearch)) {
