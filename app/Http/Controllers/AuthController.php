@@ -46,8 +46,8 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User Logged In Successfully',
-            'access_token' => $result['access_token'] ? $result['access_token'] : $result->createToken('Access Token', [TokenAbilities::ACCESS_TOKEN], Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken,
-            'refresh_token' => $result['refresh_token'] ? $result['refresh_token'] : null,
+            'access_token' => $result['access_token'],
+            'refresh_token' => $result['refresh_token'],
         ], Response::HTTP_OK);
     }
 
