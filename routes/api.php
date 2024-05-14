@@ -1,20 +1,20 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AuthController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(AuthController::class)->prefix('auth')->group(function () {
-    Route::post('/register', 'register');
-    Route::post('/login', 'login');
+    Route::post('/register', 'register')->name('auth.register');
+    Route::post('/login', 'login')->name('auth.login');
     Route::get('/forgot-password', 'request')->name('password.request');
-    Route::post('/forgot-password','send')->name('password.email');
+    Route::post('/forgot-password', 'send')->name('password.email');
     Route::get('/reset-password/{token}', 'create')->name('password.create');
     Route::post('/reset-password', 'reset')->name('password.reset');
+    Route::post('/refresh', 'refresh')->name('token.refresh');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
