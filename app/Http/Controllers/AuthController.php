@@ -34,28 +34,19 @@ class AuthController extends Controller
     public function login(LoginUserRequest $request)
     {
         $result = $this->authService->loginUser($request);
-        $result = $this->authService->loginUser($request);
 
-        if (! $result) {
+        if (!$result) {
             return response()->json([
                 'status' => false,
                 'message' => 'Email & Password does not match with our record.',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        if (is_array($result)) {
-            return response()->json([
-                'status' => true,
-                'message' => 'User Logged In Successfully',
-                'access_token' => $result['access_token'],
-                'refresh_token' => $result['refresh_token'],
-            ], Response::HTTP_OK);
-        }
-
         return response()->json([
             'status' => true,
             'message' => 'User Logged In Successfully',
-            'token' => $result->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken,
+            'access_token' => $result['access_token'] ? $result['access_token'] : $result->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken,
+            'refresh_token' => $result['refresh_token'] ? $result['refresh_token'] : null,
         ], Response::HTTP_OK);
     }
 
@@ -63,7 +54,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->refreshToken($request);
 
-        if (! $result) {
+        if (!$result) {
             return response()->json([
                 'status' => false,
                 'message' => 'Email & Password does not match with our record.',
