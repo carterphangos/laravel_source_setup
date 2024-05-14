@@ -9,6 +9,8 @@ use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\SendEmailRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use Exception;
+use Illuminate\Http\Response;
 
 class AuthController extends Controller
 {
@@ -21,17 +23,41 @@ class AuthController extends Controller
 
     public function register(RegisterUserRequest $request)
     {
-        return $this->authService->registerUser($request);
+        $user = $this->authService->registerUser($request);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User Created Successfully',
+            'token' => $user->createToken('API TOKEN')->plainTextToken,
+        ], Response::HTTP_OK);
     }
 
     public function login(LoginUserRequest $request)
     {
-        return $this->authService->loginUser($request);
+        $user = $this->authService->loginUser($request);
+
+        if ($user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email & Password does not match with our record.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User Created Successfully',
+            'token' => $user->createToken('API TOKEN')->plainTextToken,
+        ], Response::HTTP_OK);
     }
 
     public function update(UpdateUserRequest $request)
     {
-        return $this->authService->updatePasswordUser($request);
+        $this->authService->updatePasswordUser($request);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password updated successfully.',
+        ],  Response::HTTP_OK);
     }
 
     public function request()
@@ -41,16 +67,38 @@ class AuthController extends Controller
 
     public function send(SendEmailRequest $request)
     {
-        return $this->authService->sendEmailResetPassword($request);
+        $this->authService->sendEmailResetPassword($request);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'We have e-mailed your password reset link!',
+        ], Response::HTTP_OK);
     }
 
     public function create($token)
     {
-        return $this->authService->createNewPassword($token);
+        if ($this->authService->createNewPassword($token)) {
+            return view('auth.reset-password', ['token' => $token]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'This password reset token is invalid or has expired.',
+        ], Response::HTTP_NOT_FOUND);
     }
 
     public function reset(ResetPasswordRequest $request)
     {
-        return $this->authService->resetPassword($request);
+        $result = $this->authService->resetPassword($request);
+
+        if ($result) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Your password has been reset successfully.',
+            ], Response::HTTP_OK);
+        }
+        return response()->json([
+            'status' => false,
+            'message' =>  'This password reset token is invalid or has expired.',
+        ], Response::HTTP_NOT_FOUND);
     }
 }

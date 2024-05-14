@@ -27,10 +27,6 @@ class SendPasswordResetEmail implements ShouldQueue
 
     public function handle()
     {
-        try {
-            Mail::to($this->email)->send(new ResetPassword($this->token, $this->expiresAt));
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
+        Mail::to($this->email)->send(new ResetPassword($this->token, $this->expiresAt));
     }
 }
