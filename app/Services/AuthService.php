@@ -65,26 +65,6 @@ class AuthService
         ];
     }
 
-    public function refreshToken(Request $request)
-    {
-        $refreshToken = $request->input('refresh_token');
-
-        $user = auth()->user();
-        $tokenModel = $user->tokens()->where('token', $refreshToken)->first();
-
-        if (! $tokenModel || $tokenModel->expired()) {
-            return false;
-        }
-
-        $accessToken = $user->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken;
-        $refreshToken = $user->createToken('Refresh Token', ['*'], now()->addDays(7))->plainTextToken;
-
-        return [
-            'access_token' => $accessToken,
-            'refresh_token' => $refreshToken,
-        ];
-    }
-
     public function updatePasswordUser(Request $request)
     {
         $user = auth()->user();

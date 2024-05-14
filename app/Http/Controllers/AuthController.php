@@ -9,7 +9,6 @@ use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendEmailRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\AuthService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -41,15 +40,6 @@ class AuthController extends Controller
                 'status' => false,
                 'message' => 'Email & Password does not match with our record.',
             ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        if (is_array($result)) {
-            return response()->json([
-                'status' => true,
-                'message' => 'User Logged In Successfully',
-                'access_token' => $result['access_token'],
-                'refresh_token' => $result['refresh_token'],
-            ], Response::HTTP_OK);
         }
 
         return response()->json([
