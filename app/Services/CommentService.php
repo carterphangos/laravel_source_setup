@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CommentColumns;
 use App\Models\Comment;
 use Illuminate\Contracts\Pagination\Paginator;
 
@@ -18,7 +19,7 @@ class CommentService extends BaseService
             ->PostIdGreaterThan($filters['postId'] ?? false)
             ->AuthorIdGreaterThan($filters['authorId'] ?? false);
 
-        $columnSearch = config('constants.COMMENTS_COLUMNS');
+        $columnSearch = [CommentColumns::Title];
 
         return $this->getAll($perPage, $query, $filters, $columnSearch, $filters['termSearch']);
     }

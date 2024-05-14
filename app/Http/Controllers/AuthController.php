@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TokenAbilities;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendEmailRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\AuthService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -28,7 +29,6 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User Created Successfully',
-            'token' => $user->createToken('Access Token', [config('constants.TOKEN_ABILITIES.ACCESS_TOKEN')],  Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken,
         ], Response::HTTP_OK);
     }
 
@@ -36,7 +36,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->loginUser($request);
 
-        if (!$result) {
+        if (! $result) {
             return response()->json([
                 'status' => false,
                 'message' => 'Email & Password does not match with our record.',
@@ -46,7 +46,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User Logged In Successfully',
-            'access_token' => $result['access_token'] ? $result['access_token'] : $result->createToken('Access Token', [config('constants.TOKEN_ABILITIES.ACCESS_TOKEN')],  Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken,
+            'access_token' => $result['access_token'] ? $result['access_token'] : $result->createToken('Access Token', [TokenAbilities::ACCESS_TOKEN], Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken,
             'refresh_token' => $result['refresh_token'] ? $result['refresh_token'] : null,
         ], Response::HTTP_OK);
     }
@@ -55,7 +55,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->refreshToken($request);
 
-        if (!$result) {
+        if (! $result) {
             return response()->json([
                 'status' => false,
                 'message' => 'Your refresh token is invalid or has expired.',
