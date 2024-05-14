@@ -35,6 +35,9 @@
 
                             <button type="submit" class="btn btn-primary">Login</button>
                         </form>
+                        <div class="m-3"></div>
+                        <button id="logged" class="btn btn-primary">Check Access Token</button>
+                        <button id="refresh" class="btn btn-primary">Refresh Token</button>
                     </div>
                 </div>
             </div>
@@ -59,32 +62,34 @@
                     remember: remember
                 })
                 .then(function(response) {
-                    localStorage.setItem('access_token', response.data.access_token);
-                    localStorage.setItem('refresh_token', response.data.refresh_token);
+                    localStorage.setItem('access_token', response.data.access_token.split('|')[1]);
+                    localStorage.setItem('refresh_token', response.data.refresh_token.split('|')[1]);
 
-                    redirectToPosts(response.data.access_token);
-
+                    redirectToLogged(response.data.access_token.split('|')[1]);
                 })
                 .catch(function(error) {
                     alert('Login failed. Please try again.');
                 });
         });
 
-        function redirectToPosts(accessToken) {
-            axios.get('/api/posts', {
+        const logged = document.getElementById('logged');
+        const refresh = document.getElementById('refresh');
+
+        logged.addEventListener('click', () => redirectToLogged(localStorage.getItem('access_token')));
+
+        refresh.addEventListener('click', () => refreshAccessToken(localStorage.getItem('refresh_token')));
+
+        function redirectToLogged(accessToken) {
+            axios.get('/logged', {
                     headers: {
                         'Authorization': 'Bearer ' + accessToken
                     }
                 })
-                .then(function(response) {
+                .then(response => {
                     console.log(response.data);
                 })
-                .catch(function(error) {
-                    if (error.response.status === 401) {
-                        refreshAccessToken(localStorage.getItem('refresh_token'));
-                    } else {
-                        console.error(error);
-                    }
+                .catch(error => {
+                    console.error('Access denied. Please log in.', error);
                 });
         }
 

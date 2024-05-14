@@ -50,6 +50,12 @@ class AuthService
     {
         $user = $request->user();
 
+        $refreshToken = substr($request->header('Authorization'), 7);
+
+        $token = \Laravel\Sanctum\PersonalAccessToken::findToken($refreshToken);
+
+        $token->delete();
+
         $accessToken = $user->createToken('Access Token', [config('constants.TOKEN_ABILITIES.ACCESS_TOKEN')],  Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken;
         $refreshToken = $user->createToken('Refresh Token', [config('constants.TOKEN_ABILITIES.REFRESH_TOKEN')], Carbon::now()->addMinutes(config('sanctum.rt_expiration')))->plainTextToken;
 

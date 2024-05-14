@@ -64,7 +64,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'User Logged In Successfully',
+            'message' => 'Your access token has been refreshed.',
             'access_token' => $result['access_token'],
             'refresh_token' => $result['refresh_token'],
         ], Response::HTTP_OK);
