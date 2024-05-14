@@ -26,7 +26,7 @@ class AuthService
 
     public function loginUser(Request $request)
     {
-        if (! Auth::attempt($request->only(['email', 'password']))) {
+        if (!Auth::attempt($request->only(['email', 'password']))) {
             return null;
         }
 
@@ -34,8 +34,8 @@ class AuthService
 
         if ($request->has('remember')) {
 
-            $accessToken = $user->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken;
-            $refreshToken = $user->createToken('Refresh Token', ['*'], now()->addDays(7))->plainTextToken;
+            $accessToken = $user->createToken('Access Token', [config('constants.TOKEN_ABILITIES.ACCESS_TOKEN')], Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken;
+            $refreshToken = $user->createToken('Refresh Token',  [config('constants.TOKEN_ABILITIES.REFRESH_TOKEN')], Carbon::now()->addMinutes(config('sanctum.rt_expiration')))->plainTextToken;
 
             return [
                 'access_token' => $accessToken,
@@ -48,17 +48,10 @@ class AuthService
 
     public function refreshToken(Request $request)
     {
-        $refreshToken = $request->input('refresh_token');
+        $user = $request->user();
 
-        $user = auth()->user();
-        $tokenModel = $user->tokens()->where('token', $refreshToken)->first();
-
-        if (! $tokenModel || $tokenModel->expired()) {
-            return false;
-        }
-
-        $accessToken = $user->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken;
-        $refreshToken = $user->createToken('Refresh Token', ['*'], now()->addDays(7))->plainTextToken;
+        $accessToken = $user->createToken('Access Token', [config('constants.TOKEN_ABILITIES.ACCESS_TOKEN')],  Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken;
+        $refreshToken = $user->createToken('Refresh Token', [config('constants.TOKEN_ABILITIES.REFRESH_TOKEN')], Carbon::now()->addMinutes(config('sanctum.rt_expiration')))->plainTextToken;
 
         return [
             'access_token' => $accessToken,

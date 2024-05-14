@@ -10,4 +10,8 @@ return [
     'COMMENTS_COLUMNS' => [
         'content',
     ],
+    'TOKEN_ABILITIES' => [
+        'ACCESS_TOKEN' => 'access-api',
+        'REFRESH_TOKEN' => 'access-token'
+    ],
 ];
