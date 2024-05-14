@@ -14,6 +14,7 @@ Route::controller(AuthController::class)->prefix('auth')->group(function () {
     Route::post('/forgot-password', 'send')->name('password.email');
     Route::get('/reset-password/{token}', 'create')->name('password.create');
     Route::post('/reset-password', 'reset')->name('password.reset');
+    Route::post('/refresh', 'refresh')->name('token.refresh');
 });
 
 Route::middleware(['auth:sanctum', 'ability:access-token'])->group(function () {

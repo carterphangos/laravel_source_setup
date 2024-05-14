@@ -43,6 +43,15 @@ class AuthController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
 
+        if (is_array($result)) {
+            return response()->json([
+                'status' => true,
+                'message' => 'User Logged In Successfully',
+                'access_token' => $result['access_token'],
+                'refresh_token' => $result['refresh_token'],
+            ], Response::HTTP_OK);
+        }
+
         return response()->json([
             'status' => true,
             'message' => 'User Logged In Successfully',
