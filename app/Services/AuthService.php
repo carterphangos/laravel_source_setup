@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\TokenAbilities;
 use App\Jobs\SendPasswordResetEmail;
 use App\Models\User;
 use Carbon\Carbon;
@@ -32,18 +33,36 @@ class AuthService
 
         $user = User::where('email', $request->email)->first();
 
+        $accessToken = $user->createToken('Access Token', [TokenAbilities::ACCESS_TOKEN], Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken;
+        $refreshToken = null;
+
         if ($request->has('remember')) {
-
-            $accessToken = $user->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken;
-            $refreshToken = $user->createToken('Refresh Token', ['*'], now()->addDays(7))->plainTextToken;
-
-            return [
-                'access_token' => $accessToken,
-                'refresh_token' => $refreshToken,
-            ];
+            $refreshToken = $user->createToken('Refresh Token', [TokenAbilities::REFRESH_TOKEN], Carbon::now()->addMinutes(config('sanctum.rt_expiration')))->plainTextToken;
         }
 
-        return $user;
+        return [
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+        ];
+    }
+
+    public function refreshToken(Request $request)
+    {
+        $user = $request->user();
+
+        $refreshToken = substr($request->header('Authorization'), 7);
+
+        $token = \Laravel\Sanctum\PersonalAccessToken::findToken($refreshToken);
+
+        $token->delete();
+
+        $accessToken = $user->createToken('Access Token', [TokenAbilities::ACCESS_TOKEN], Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken;
+        $refreshToken = $user->createToken('Refresh Token', [TokenAbilities::REFRESH_TOKEN], Carbon::now()->addMinutes(config('sanctum.rt_expiration')))->plainTextToken;
+
+        return [
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+        ];
     }
 
     public function refreshToken(Request $request)

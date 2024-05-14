@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TokenAbilities;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendEmailRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\AuthService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -27,13 +29,11 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User Created Successfully',
-            'token' => $user->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken,
         ], Response::HTTP_OK);
     }
 
     public function login(LoginUserRequest $request)
     {
-        $result = $this->authService->loginUser($request);
         $result = $this->authService->loginUser($request);
 
         if (! $result) {
@@ -55,7 +55,8 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User Logged In Successfully',
-            'token' => $result->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken,
+            'access_token' => $result['access_token'],
+            'refresh_token' => $result['refresh_token'],
         ], Response::HTTP_OK);
     }
 
@@ -66,13 +67,13 @@ class AuthController extends Controller
         if (! $result) {
             return response()->json([
                 'status' => false,
-                'message' => 'Email & Password does not match with our record.',
+                'message' => 'Your refresh token is invalid or has expired.',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
         return response()->json([
             'status' => true,
-            'message' => 'User Logged In Successfully',
+            'message' => 'Your access token has been refreshed.',
             'access_token' => $result['access_token'],
             'refresh_token' => $result['refresh_token'],
         ], Response::HTTP_OK);

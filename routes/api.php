@@ -17,6 +17,10 @@ Route::controller(AuthController::class)->prefix('auth')->group(function () {
     Route::post('/refresh', 'refresh')->name('token.refresh');
 });
 
+Route::middleware(['auth:sanctum', 'ability:access-token'])->group(function () {
+    Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(AuthController::class)->prefix('auth')->group(function () {
         Route::post('/update', 'update');
