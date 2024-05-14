@@ -18,7 +18,7 @@ class BaseService
     {
         $sortColumn = $filters['sortColumn'] ?? 'created_at';
         $sortOrder = $filters['sortOrder'] ?? 'desc';
-      
+
         $query->orderBy($sortColumn, $sortOrder);
 
         if ($termSearch && is_array($columnSearch)) {
