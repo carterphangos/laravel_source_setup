@@ -3,10 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class ResetPassword extends Mailable
@@ -14,6 +11,7 @@ class ResetPassword extends Mailable
     use Queueable, SerializesModels;
 
     public $token;
+
     public $expiresAt;
 
     /**
@@ -34,5 +32,4 @@ class ResetPassword extends Mailable
                 'expiresAt' => $this->expiresAt->format('H:i, d M Y'),
             ]);
     }
-
 }

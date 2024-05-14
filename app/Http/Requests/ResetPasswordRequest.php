@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ResetPasswordRequest extends FormRequest
@@ -12,7 +12,7 @@ class ResetPasswordRequest extends FormRequest
     {
         return [
             'password' => 'required|confirmed|min:8',
-            'password_confirmation' => 'required'
+            'password_confirmation' => 'required',
         ];
     }
 

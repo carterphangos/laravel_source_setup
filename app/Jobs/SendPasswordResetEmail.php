@@ -15,7 +15,9 @@ class SendPasswordResetEmail implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $token;
+
     public $expiresAt;
+
     public $email;
 
     public function __construct($token, $expiresAt, $email)

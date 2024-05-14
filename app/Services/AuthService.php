@@ -2,17 +2,14 @@
 
 namespace App\Services;
 
-use Exception;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\Request;
-use App\Mail\ResetPassword;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\Jobs\SendPasswordResetEmail;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthService
 {
@@ -29,13 +26,44 @@ class AuthService
 
     public function loginUser(Request $request)
     {
-        if (!Auth::attempt($request->only(['email', 'password']))) {
-            return;
+        if (! Auth::attempt($request->only(['email', 'password']))) {
+            return null;
         }
 
         $user = User::where('email', $request->email)->first();
 
+        if ($request->has('remember')) {
+
+            $accessToken = $user->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken;
+            $refreshToken = $user->createToken('Refresh Token', ['*'], now()->addDays(7))->plainTextToken;
+
+            return [
+                'access_token' => $accessToken,
+                'refresh_token' => $refreshToken,
+            ];
+        }
+
         return $user;
+    }
+
+    public function refreshToken(Request $request)
+    {
+        $refreshToken = $request->input('refresh_token');
+
+        $user = auth()->user();
+        $tokenModel = $user->tokens()->where('token', $refreshToken)->first();
+
+        if (! $tokenModel || $tokenModel->expired()) {
+            return false;
+        }
+
+        $accessToken = $user->createToken('Access Token', ['*'], now()->addHours(2))->plainTextToken;
+        $refreshToken = $user->createToken('Refresh Token', ['*'], now()->addDays(7))->plainTextToken;
+
+        return [
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+        ];
     }
 
     public function updatePasswordUser(Request $request)
@@ -43,7 +71,7 @@ class AuthService
         $user = auth()->user();
 
         $user->update([
-            'password' => Hash::make($request->new_password)
+            'password' => Hash::make($request->new_password),
         ]);
     }
 
@@ -78,6 +106,7 @@ class AuthService
         if ($passwordReset) {
             return true;
         }
+
         return false;
     }
 
@@ -95,6 +124,7 @@ class AuthService
 
             return true;
         }
+
         return false;
     }
 }
