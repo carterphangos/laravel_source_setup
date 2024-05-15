@@ -22,11 +22,14 @@ class SyncDatabaseToCache extends Command
 
     public function handle()
     {
-        $this->info('Syncing database with cache...');
+        $cacheKey = $this->generateCacheKey();
 
         $posts = $this->postService->getAllPosts(BaseLimit::LIMIT_10);
-        Cache::put('posts', $posts, now()->addMinutes(5));
+        Cache::put($cacheKey, $posts, now()->addMinutes(5));
+    }
 
-        $this->info('Database synced with cache successfully!');
+    private function generateCacheKey(): string
+    {
+        return 'postsPage1';
     }
 }

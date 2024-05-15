@@ -21,7 +21,8 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $posts = Cache::get('posts');
+        $cacheKey = $this->generateCacheKey($request->all());
+        $posts = Cache::get($cacheKey);
         if ($posts) {
             return response()->json([
                 'status' => true,
@@ -35,7 +36,7 @@ class PostController extends Controller
             $request->except('perPage')
         );
 
-        Cache::put('posts', $posts, now()->addMinutes(5));
+        Cache::put($cacheKey, $posts, now()->addMinutes(5));
 
         return response()->json([
             'status' => true,
@@ -103,9 +104,28 @@ class PostController extends Controller
         ], Response::HTTP_OK);
     }
 
-    private function syncCache()
+    private function generateCacheKey($filters)
     {
-        $posts = $this->postService->getAllPosts(BaseLimit::LIMIT_10);
-        Cache::put('posts', $posts, now()->addMinutes(5));
+        $key = 'posts';
+
+        if (isset($filters['commentCount'])) {
+            $key .= 'Has' . $filters['commentCount'] . 'Comment';
+        }
+
+        if (isset($filters['authorId'])) {
+            $key .= 'HasId' . $filters['authorId'];
+        }
+
+        $key .= 'Page' . ($filters['page'] ?? 1);
+
+        return $key;
+    }
+
+    private function syncCache($filters = [])
+    {
+        $cacheKey = $this->generateCacheKey($filters);
+
+        $posts = $this->postService->getAllPosts(BaseLimit::LIMIT_10, $filters);
+        Cache::put($cacheKey, $posts, now()->addMinutes(5));
     }
 }
