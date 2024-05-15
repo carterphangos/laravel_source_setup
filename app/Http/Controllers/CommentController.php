@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateCommentRequest;
 use App\Services\CommentService;
 use Illuminate\Http\Request;
+use App\Enums\BaseLimit;
 
 class CommentController extends Controller
 {
@@ -16,18 +18,10 @@ class CommentController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->input('perPage', 10);
-
-        $filters = $request->except('page', 'perPage');
-        $filters = [
-            'postId' => $request->input('postId'),
-            'authorId' => $request->input('authorId'),
-            'sortColumn' => $request->input('sortColumn'),
-            'sortOrder' => $request->input('sortOrder'),
-            'termSearch' => $request->input('termSearch'),
-        ];
-
-        $comments = $this->commentService->getAllComments($perPage, $filters);
+        $comments = $this->commentService->getAllComments(
+            $request->input('perPage', BaseLimit::LIMIT_10),
+            $request->except('perPage')
+        );
 
         return view('comments.index', compact('comments'));
     }
@@ -46,13 +40,9 @@ class CommentController extends Controller
         return redirect()->route('posts.show', $validatedData['post_id']);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateCommentRequest $request, $id)
     {
-        $validatedData = $request->validate([
-            'content' => 'required',
-        ]);
-
-        $comment = $this->commentService->update($id, $validatedData);
+        $comment = $this->commentService->update($id, $request->all());
 
         return redirect()->route('posts.show', $comment->post_id);
     }

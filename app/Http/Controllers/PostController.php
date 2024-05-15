@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdatePostRequest;
 use App\Services\PostService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
+use App\Enums\BaseLimit;
 
 class PostController extends Controller
 {
@@ -16,18 +20,10 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->input('perPage', 10);
-        $filters = $request->except('page', 'perPage');
-
-        $filters = [
-            'commentCount' => $request->input('commentCount'),
-            'authorId' => $request->input('authorId'),
-            'sortColumn' => $request->input('sortColumn'),
-            'sortOrder' => $request->input('sortOrder'),
-            'termSearch' => $request->input('termSearch'),
-        ];
-
-        $posts = $this->postService->getAllPosts($perPage, $filters);
+        $posts = $this->postService->getAllPosts(
+            $request->input('perPage', BaseLimit::LIMIT_10),
+            $request->except('perPage')
+        );
 
         return view('posts.index', compact('posts'));
     }
@@ -57,25 +53,29 @@ class PostController extends Controller
     {
         $post = $this->postService->getById($id);
 
+        Gate::authorize('update', $post);
+
         return view('posts.edit', compact('post'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdatePostRequest $request, $id)
     {
-        $validatedData = $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'required',
-        ]);
+        $post = $this->postService->update($id, $request->all());
 
-        $this->postService->update($id, $validatedData);
-
-        return redirect()->route('posts.index');
+        return response()->json([
+            'status' => true,
+            'message' => 'Post Edited Successfully',
+            'data' => $post,
+        ], Response::HTTP_OK);
     }
 
     public function destroy($id)
     {
         $this->postService->delete($id);
 
-        return redirect()->route('posts.index');
+        return response()->json([
+            'status' => true,
+            'message' => 'Post Deleted Successfully',
+        ], Response::HTTP_OK);
     }
 }

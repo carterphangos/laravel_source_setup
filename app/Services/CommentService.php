@@ -13,7 +13,7 @@ class CommentService extends BaseService
         parent::__construct($comment);
     }
 
-    public function getAllComments($perPage = 10, $filters = []): Paginator
+    public function getAllComments($perPage, $filters = []): Paginator
     {
         $query = $this->model
             ->PostIdGreaterThan($filters['postId'] ?? false)

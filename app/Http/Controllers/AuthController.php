@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\TokenAbilities;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\ResetPasswordRequest;
@@ -23,7 +22,7 @@ class AuthController extends Controller
 
     public function register(RegisterUserRequest $request)
     {
-        $user = $this->authService->registerUser($request);
+        $this->authService->registerUser($request);
 
         return response()->json([
             'status' => true,
