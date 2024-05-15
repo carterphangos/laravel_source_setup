@@ -6,6 +6,7 @@ use App\Http\Requests\UpdateCommentRequest;
 use App\Services\CommentService;
 use Illuminate\Http\Request;
 use App\Enums\BaseLimit;
+use App\Events\NewCommentEvent;
 
 class CommentController extends Controller
 {
@@ -35,7 +36,9 @@ class CommentController extends Controller
 
         $validatedData['user_id'] = 1;
 
-        $this->commentService->create($validatedData);
+        $comment = $this->commentService->create($validatedData);
+
+        event(new NewCommentEvent($comment));
 
         return redirect()->route('posts.show', $validatedData['post_id']);
     }
