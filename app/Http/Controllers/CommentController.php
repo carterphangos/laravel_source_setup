@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateCommentRequest;
 use App\Services\CommentService;
 use Illuminate\Http\Request;
 
@@ -46,13 +47,9 @@ class CommentController extends Controller
         return redirect()->route('posts.show', $validatedData['post_id']);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateCommentRequest $request, $id)
     {
-        $validatedData = $request->validate([
-            'content' => 'required',
-        ]);
-
-        $comment = $this->commentService->update($id, $validatedData);
+        $comment = $this->commentService->update($id, $request->all());
 
         return redirect()->route('posts.show', $comment->post_id);
     }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 
 class BaseService
 {
@@ -45,6 +46,9 @@ class BaseService
     public function update($id, array $data)
     {
         $model = $this->model->findOrFail($id);
+
+        Gate::authorize('update', $model);
+
         $model->update($data);
 
         return $model;
@@ -53,6 +57,9 @@ class BaseService
     public function delete($id)
     {
         $model = $this->model->findOrFail($id);
+
+        Gate::authorize('delete', $model);
+
         $model->delete();
 
         return $model;
