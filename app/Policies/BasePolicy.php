@@ -3,12 +3,13 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Enums\UserRoles;
 
 class BasePolicy
 {
     public function isAdmin(User $user)
     {
-        return $user->role === 'admin';
+        return $user->role === UserRoles::ADMIN_ROLE;
     }
 
     public function owns(User $user, $subject)

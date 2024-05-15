@@ -13,7 +13,7 @@ class PostService extends BaseService
         parent::__construct($post);
     }
 
-    public function getAllPosts($perPage = 10, $filters = []): Paginator
+    public function getAllPosts($perPage, $filters = []): Paginator
     {
         $query = $this->model
             ->hasManyComments($filters['commentCount'] ?? false)
@@ -24,6 +24,6 @@ class PostService extends BaseService
             PostColumns::Content,
         ];
 
-        return $this->getAll($perPage, $query, $filters, $columnSearch, $filters['termSearch']);
+        return $this->getAll($perPage, $query, $filters, $columnSearch, $filters['termSearch'] ?? null);
     }
 }

@@ -7,6 +7,7 @@ use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use App\Enums\BaseLimit;
 
 class PostController extends Controller
 {
@@ -19,18 +20,10 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->input('perPage', 10);
-        $filters = $request->except('page', 'perPage');
-
-        $filters = [
-            'commentCount' => $request->input('commentCount'),
-            'authorId' => $request->input('authorId'),
-            'sortColumn' => $request->input('sortColumn'),
-            'sortOrder' => $request->input('sortOrder'),
-            'termSearch' => $request->input('termSearch'),
-        ];
-
-        $posts = $this->postService->getAllPosts($perPage, $filters);
+        $posts = $this->postService->getAllPosts(
+            $request->input('perPage', BaseLimit::LIMIT_10),
+            $request->except('perPage')
+        );
 
         return view('posts.index', compact('posts'));
     }
@@ -66,7 +59,7 @@ class PostController extends Controller
     }
 
     public function update(UpdatePostRequest $request, $id)
-    {        
+    {
         $post = $this->postService->update($id, $request->all());
 
         return response()->json([
@@ -83,5 +76,6 @@ class PostController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Post Deleted Successfully',
-        ], Response::HTTP_OK);    }
+        ], Response::HTTP_OK);
+    }
 }
