@@ -8,8 +8,10 @@
         "php": "^8.2",
         "bensampo/laravel-enum": "^6.11",
         "laravel/framework": "^11.0",
+        "laravel/reverb": "@beta",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "pusher/pusher-php-server": "^7.2",
         "sentry/sentry-laravel": "^4.5"
     },
     "require-dev": {
