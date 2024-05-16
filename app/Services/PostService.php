@@ -9,15 +9,21 @@ use Illuminate\Contracts\Pagination\Paginator;
 class PostService extends BaseService
 {
     protected $cacheService;
+    protected $logService;
 
-    public function __construct(Post $post, CacheService $cacheService)
+    public function __construct(Post $post, CacheService $cacheService, LogService $logService)
     {
         parent::__construct($post);
         $this->cacheService = $cacheService;
+        $this->logService = $logService;
     }
 
     public function getAllPosts($perPage, $filters = []): Paginator
     {
+        $this->logService->info('this is a info message', 'path/to/getAllPost.log');
+        $this->logService->error('this is an error message', 'path/to/getAllPost.log');
+        $this->logService->warn('this is a warn message', 'path/to/getAllPost.log');
+
         $cacheKey = $this->cacheService->generateCacheKey('Post', $filters);
         $posts = $this->cacheService->get($cacheKey);
 
