@@ -24,6 +24,7 @@ Route::middleware(['auth:sanctum', 'ability:access-token'])->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(AuthController::class)->prefix('auth')->group(function () {
         Route::post('/update', 'update');
+        Route::post('/logout', 'logout')->name('auth.logout');
     });
 });
 

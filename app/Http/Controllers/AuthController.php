@@ -49,6 +49,16 @@ class AuthController extends Controller
         ], Response::HTTP_OK);
     }
 
+    public function logout(Request $request)
+    {
+        $this->authService->logoutUser($request);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User Logged Out Successfully.',
+        ], Response::HTTP_OK);    
+    }
+
     public function refresh(Request $request)
     {
         $result = $this->authService->refreshToken($request);

@@ -25,7 +25,11 @@ class PostController extends Controller
             $request->except('perPage')
         );
 
-        return view('posts.index', compact('posts'));
+        return response()->json([
+            'status' => true,
+            'message' => 'All Posts Get Successfully',
+            'data' => $posts,
+        ], Response::HTTP_OK);
     }
 
     public function store(Request $request)
@@ -46,7 +50,11 @@ class PostController extends Controller
     {
         $post = $this->postService->getById($id);
 
-        return view('posts.show', compact('post'));
+        return response()->json([
+            'status' => true,
+            'message' => 'Post Get Successfully',
+            'data' => $post,
+        ], Response::HTTP_OK);
     }
 
     public function edit($id)
@@ -60,7 +68,7 @@ class PostController extends Controller
 
     public function update(UpdatePostRequest $request, $id)
     {
-        $post = $this->postService->update($id, $request->all());
+        $post = $this->postService->updatePost($id, $request->all());
 
         return response()->json([
             'status' => true,
@@ -71,11 +79,11 @@ class PostController extends Controller
 
     public function destroy($id)
     {
-        $this->postService->delete($id);
+        $this->postService->deletePost($id);
 
         return response()->json([
             'status' => true,
             'message' => 'Post Deleted Successfully',
         ], Response::HTTP_OK);
-    }
+    }   
 }
