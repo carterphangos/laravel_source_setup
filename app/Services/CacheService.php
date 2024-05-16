@@ -24,7 +24,7 @@ class CacheService
         Cache::forget($key);
     }
 
-    public function generateCacheKey($key, $filters)
+    public function formatCacheKey($filters)
     {
         if (! isset($filters['page'])) {
             $filters['page'] = 1;
@@ -32,11 +32,17 @@ class CacheService
 
         ksort($filters);
 
+        $parts = [];
         foreach ($filters as $filterKey => $filterValue) {
-            $key .= $filterKey .  $filterValue;
+            $parts[] = ucfirst($filterKey) . ':' . $filterValue;
         }
 
-        return $key;
+        return implode('-', $parts);
+    }
+
+    public function generateCacheKey($key, $filters)
+    {
+        return $key . '-' . $this->formatCacheKey($filters);
     }
 
     public function syncCache($model)
@@ -48,7 +54,7 @@ class CacheService
         $totalPages = $model::paginate(BaseLimit::LIMIT_10)->lastPage();
 
         for ($page = 1; $page <= $totalPages; $page++) {
-            $pageCacheKey = $name . 'page' . $page;
+            $pageCacheKey = $name . '-Page:' . $page;
 
             $pageData = $model::paginate(BaseLimit::LIMIT_10, ['*'], 'page', $page);
 
