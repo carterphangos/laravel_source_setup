@@ -12,24 +12,24 @@ class SyncDatabaseToCache extends Command
     protected $signature = 'app:sync-database-to-cache';
     protected $description = 'Sync database posts with cache every 5 minutes';
 
-    protected $postService;
+    // protected $postService;
 
     public function __construct(PostService $postService)
     {
         parent::__construct();
-        $this->postService = $postService;
+        // $this->postService = $postService;
     }
 
-    public function handle()
-    {
-        $cacheKey = $this->generateCacheKey();
+    // public function handle()
+    // {
+    //     $cacheKey = $this->generateCacheKey();
 
-        $posts = $this->postService->getAllPosts(BaseLimit::LIMIT_10);
-        Cache::put($cacheKey, $posts, now()->addMinutes(5));
-    }
+    //     $posts = $this->postService->getAllPosts(BaseLimit::LIMIT_10);
+    //     Cache::put($cacheKey, $posts, now()->addMinutes(5));
+    // }
 
-    private function generateCacheKey(): string
-    {
-        return 'postsPage1';
-    }
+    // private function generateCacheKey(): string
+    // {
+    //     return 'postsPage1';
+    // }
 }

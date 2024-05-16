@@ -7,6 +7,7 @@ use App\Services\CommentService;
 use Illuminate\Http\Request;
 use App\Enums\BaseLimit;
 use App\Events\NewCommentEvent;
+use Illuminate\Http\Response;
 
 class CommentController extends Controller
 {
@@ -24,7 +25,11 @@ class CommentController extends Controller
             $request->except('perPage')
         );
 
-        return view('comments.index', compact('comments'));
+        return response()->json([
+            'status' => true,
+            'message' => 'All Comments Get Successfully',
+            'data' => $comments,
+        ], Response::HTTP_OK);
     }
 
     public function store(Request $request)
@@ -45,15 +50,22 @@ class CommentController extends Controller
 
     public function update(UpdateCommentRequest $request, $id)
     {
-        $comment = $this->commentService->update($id, $request->all());
+        $comment = $this->commentService->updateComment($id, $request->all());
 
-        return redirect()->route('posts.show', $comment->post_id);
+        return response()->json([
+            'status' => true,
+            'message' => 'Comment Edited Successfully',
+            'data' => $comment,
+        ], Response::HTTP_OK);
     }
 
     public function destroy($id)
     {
-        $this->commentService->delete($id);
+        $this->commentService->deleteComment($id);
 
-        return redirect()->route('posts.index');
+        return response()->json([
+            'status' => true,
+            'message' => 'Comment Deleted Successfully',
+        ], Response::HTTP_OK);
     }
 }

@@ -8,19 +8,48 @@ use Illuminate\Contracts\Pagination\Paginator;
 
 class CommentService extends BaseService
 {
-    public function __construct(Comment $comment)
+    protected $cacheService;
+
+    public function __construct(Comment $comment,  CacheService $cacheService)
     {
         parent::__construct($comment);
+        $this->cacheService = $cacheService;
     }
 
     public function getAllComments($perPage, $filters = []): Paginator
     {
-        $query = $this->model
+        $cacheKey = $this->cacheService->generateCacheKey('Comment', $filters);
+        $comments = $this->cacheService->get($cacheKey);
+
+        if(!$comments){
+
+            $query = $this->model
             ->PostIdGreaterThan($filters['postId'] ?? false)
             ->AuthorIdGreaterThan($filters['authorId'] ?? false);
+            
+            $columnSearch = [CommentColumns::Title];
+            
+            $comments = $this->getAll($perPage, $query, $filters, $columnSearch, $filters['termSearch'] ?? null);
+            
+            $this->cacheService->put($cacheKey, $comments, now()->addMinutes(5));
+        }
 
-        $columnSearch = [CommentColumns::Title];
+        return $comments;
+    }
 
-        return $this->getAll($perPage, $query, $filters, $columnSearch, $filters['termSearch']);
+    public function updateComment($id, array $data)
+    {
+        $comment = $this->update($id, $data);
+
+        $this->cacheService->syncCache($comment);
+
+        return $comment;
+    }
+
+    public function deleteComment($id)
+    {
+        $comment = $this->delete($id);
+
+        $this->cacheService->syncCache($comment);
     }
 }

@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use App\Enums\BaseLimit;
-use Illuminate\Support\Facades\Cache;
 
 class PostController extends Controller
 {
@@ -21,22 +20,10 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $cacheKey = $this->generateCacheKey($request->all());
-        $posts = Cache::get($cacheKey);
-        if ($posts) {
-            return response()->json([
-                'status' => true,
-                'message' => 'All Posts Get From Cache Successfully',
-                'data' => $posts,
-            ], Response::HTTP_OK);
-        }
-
         $posts = $this->postService->getAllPosts(
             $request->input('perPage', BaseLimit::LIMIT_10),
             $request->except('perPage')
         );
-
-        Cache::put($cacheKey, $posts, now()->addMinutes(5));
 
         return response()->json([
             'status' => true,
@@ -81,9 +68,7 @@ class PostController extends Controller
 
     public function update(UpdatePostRequest $request, $id)
     {
-        $post = $this->postService->update($id, $request->all());
-
-        $this->syncCache();
+        $post = $this->postService->updatePost($id, $request->all());
 
         return response()->json([
             'status' => true,
@@ -94,38 +79,11 @@ class PostController extends Controller
 
     public function destroy($id)
     {
-        $this->postService->delete($id);
-
-        $this->syncCache();
+        $this->postService->deletePost($id);
 
         return response()->json([
             'status' => true,
             'message' => 'Post Deleted Successfully',
         ], Response::HTTP_OK);
-    }
-
-    private function generateCacheKey($filters)
-    {
-        $key = 'posts';
-
-        if (isset($filters['commentCount'])) {
-            $key .= 'Has' . $filters['commentCount'] . 'Comment';
-        }
-
-        if (isset($filters['authorId'])) {
-            $key .= 'HasId' . $filters['authorId'];
-        }
-
-        $key .= 'Page' . ($filters['page'] ?? 1);
-
-        return $key;
-    }
-
-    private function syncCache($filters = [])
-    {
-        $cacheKey = $this->generateCacheKey($filters);
-
-        $posts = $this->postService->getAllPosts(BaseLimit::LIMIT_10, $filters);
-        Cache::put($cacheKey, $posts, now()->addMinutes(5));
-    }
+    }   
 }
