@@ -20,9 +20,9 @@ class PostService extends BaseService
 
     public function getAllPosts($perPage, $filters = []): Paginator
     {
-        $this->logService->info('This is an info message.');
-        $this->logService->error('This is an error message.', ['error' => 'Something went wrong']);
-        $this->logService->warning('This is an warning message.', ['warning' => 'Something crashed']);
+        $this->logService->info('this is a info message', 'path/to/getAllPost.log');
+        $this->logService->error('this is an error message', 'path/to/getAllPost.log');
+        $this->logService->warn('this is a warn message', 'path/to/getAllPost.log');
 
         $cacheKey = $this->cacheService->generateCacheKey('Post', $filters);
         $posts = $this->cacheService->get($cacheKey);

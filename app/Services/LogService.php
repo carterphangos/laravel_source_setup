@@ -6,43 +6,39 @@ use Illuminate\Support\Facades\Log;
 
 class LogService
 {
-    public function debug(string $message, array $path = [])
+    public function info(string $message, string $path)
     {
-        Log::debug($message, $path);
+        Log::channel($this->getLogChannel($path))->info($message);
     }
 
-    public function info(string $message, array $path = [])
+    public function error(string $message, string $path)
     {
-        Log::info($message, $path);
+        Log::channel($this->getLogChannel($path))->error($message);
     }
 
-    public function notice(string $message, array $path = [])
+    public function warn(string $message, string $path)
     {
-        Log::notice($message, $path);
+        Log::channel($this->getLogChannel($path))->warning($message);
     }
 
-    public function warning(string $message, array $path = [])
+    protected function getLogChannel(string $path): string
     {
-        Log::warning($message, $path);
-    }
+        $filename = basename($path, '.log');
+        $channel = 'custom_' . $filename;
 
-    public function error(string $message, array $path = [])
-    {
-        Log::error($message, $path);
-    }
+        if (! config()->has("logging.channels.{$channel}")) {
 
-    public function critical(string $message, array $path = [])
-    {
-        Log::critical($message, $path);
-    }
+            $logPath = storage_path('logs/' . basename($path));
 
-    public function alert(string $message, array $path = [])
-    {
-        Log::alert($message, $path);
-    }
-    
-    public function emergency(string $message, array $path = [])
-    {
-        Log::emergency($message, $path);
+            config([
+                "logging.channels.{$channel}" => [
+                    'driver' => 'single',
+                    'path' => $logPath,
+                    'level' => 'debug',
+                ],
+            ]);
+        }
+
+        return 'custom_' . $filename;
     }
 }

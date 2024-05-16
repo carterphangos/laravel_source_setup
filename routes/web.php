@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Services\LogService;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,11 +16,4 @@ Route::get('/logged', function () {
 
 Route::get('/debug-sentry', function () {
     throw new Exception('My first Sentry error!');
-});
-
-Route::get('/log', function (LogService $logService) {
-    $logService->info('This is an info message.');
-    $logService->error('This is an error message.', ['error' => 'Something went wrong']);
-    $logService->warning('This is an warning message.', ['warning' => 'Something crashed']);
-    return 'Logging test.';
 });
