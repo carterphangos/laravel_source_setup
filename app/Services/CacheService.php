@@ -24,27 +24,17 @@ class CacheService
         Cache::forget($key);
     }
 
-    public function generateCacheKey($model, $filters)
+    public function generateCacheKey($key, $filters)
     {
-        $key = $model;
-
-        if (isset($filters['commentCount']) && $model === 'posts') {
-            $key .= 'Has' . $filters['commentCount'] . 'Comment';
+        if (! isset($filters['page'])) {
+            $filters['page'] = 1;
         }
 
-        if (isset($filters['authorId']) && $model === 'posts') {
-            $key .= 'HasId' . $filters['authorId'];
-        }
+        ksort($filters);
 
-        if (isset($filters['postId']) && $model === 'comments') {
-            $key .= 'Has' . $filters['postId'] . 'Comment';
+        foreach ($filters as $filterKey => $filterValue) {
+            $key .= $filterKey .  $filterValue;
         }
-
-        if (isset($filters['authorId']) && $model === 'comments') {
-            $key .= 'HasId' . $filters['authorId'];
-        }
-
-        $key .= 'Page' . ($filters['page'] ?? 1);
 
         return $key;
     }
@@ -58,7 +48,7 @@ class CacheService
         $totalPages = $model::paginate(BaseLimit::LIMIT_10)->lastPage();
 
         for ($page = 1; $page <= $totalPages; $page++) {
-            $pageCacheKey = $name . 'Page' . $page;
+            $pageCacheKey = $name . 'page' . $page;
 
             $pageData = $model::paginate(BaseLimit::LIMIT_10, ['*'], 'page', $page);
 

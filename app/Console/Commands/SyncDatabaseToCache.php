@@ -3,33 +3,26 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Services\PostService;
-use Illuminate\Support\Facades\Cache;
-use App\Enums\BaseLimit;
+use App\Services\CacheService;
+use App\Models\Post;
+use App\Models\Comment;
 
 class SyncDatabaseToCache extends Command
 {
     protected $signature = 'app:sync-database-to-cache';
     protected $description = 'Sync database posts with cache every 5 minutes';
 
-    // protected $postService;
+    protected $cacheService;
 
-    public function __construct(PostService $postService)
+    public function __construct(CacheService $cacheService)
     {
         parent::__construct();
-        // $this->postService = $postService;
+        $this->cacheService = $cacheService;
     }
 
-    // public function handle()
-    // {
-    //     $cacheKey = $this->generateCacheKey();
-
-    //     $posts = $this->postService->getAllPosts(BaseLimit::LIMIT_10);
-    //     Cache::put($cacheKey, $posts, now()->addMinutes(5));
-    // }
-
-    // private function generateCacheKey(): string
-    // {
-    //     return 'postsPage1';
-    // }
+    public function handle()
+    {
+        $this->cacheService->syncCache(Post::class);
+        $this->cacheService->syncCache(Comment::class);
+    }
 }
