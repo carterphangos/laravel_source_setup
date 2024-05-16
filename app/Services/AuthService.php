@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthService
 {
@@ -46,13 +47,18 @@ class AuthService
         ];
     }
 
+    public function logoutUser(Request $request)
+    {
+        $request->user()->tokens()->delete();
+    }
+
     public function refreshToken(Request $request)
     {
         $user = $request->user();
 
-        $refreshToken = substr($request->header('Authorization'), 7);
+        $refreshToken = $request->bearerToken();
 
-        $token = \Laravel\Sanctum\PersonalAccessToken::findToken($refreshToken);
+        $token = PersonalAccessToken::findToken($refreshToken);
 
         $token->delete();
 
@@ -67,11 +73,13 @@ class AuthService
 
     public function updatePasswordUser(Request $request)
     {
-        $user = auth()->user();
+        $user = $request->user();
 
         $user->update([
             'password' => Hash::make($request->new_password),
         ]);
+
+        $user->tokens()->delete();
     }
 
     public function requestResetPassword()
