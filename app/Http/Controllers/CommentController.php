@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BaseLimit;
+use App\Events\NewCommentEvent;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Services\CommentService;
 use Illuminate\Http\Request;
-use App\Enums\BaseLimit;
-use App\Events\NewCommentEvent;
 use Illuminate\Http\Response;
 
 class CommentController extends Controller

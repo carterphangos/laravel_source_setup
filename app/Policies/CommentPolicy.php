@@ -2,12 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Comment;
+use App\Models\User;
 
 class CommentPolicy extends BasePolicy
 {
-
     public function update(User $user, Comment $comment)
     {
         return $this->isAdmin($user) || $this->owns($user, $comment);

@@ -56,7 +56,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User Logged Out Successfully.',
-        ], Response::HTTP_OK);    
+        ], Response::HTTP_OK);
     }
 
     public function refresh(Request $request)

@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Route;
 Route::controller(AuthController::class)->prefix('auth')->group(function () {
     Route::post('/register', 'register')->name('auth.register');
     Route::post('/login', 'login')->name('auth.login');
-    Route::get('/forgot-password', 'request')->name('password.request');
+    // Route::get('/forgot-password', 'request')->name('password.request');
     Route::post('/forgot-password', 'send')->name('password.email');
-    Route::get('/reset-password/{token}', 'create')->name('password.create');
+    // Route::get('/reset-password', 'create')->name('password.create');
     Route::post('/reset-password', 'reset')->name('password.reset');
     Route::post('/refresh', 'refresh')->name('token.refresh');
 });

@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Services\CacheService;
-use App\Models\Post;
 use App\Models\Comment;
+use App\Models\Post;
+use App\Services\CacheService;
+use Illuminate\Console\Command;
 
 class SyncDatabaseToCache extends Command
 {
     protected $signature = 'app:sync-database-to-cache';
+
     protected $description = 'Sync database posts with cache every 5 minutes';
 
     protected $cacheService;

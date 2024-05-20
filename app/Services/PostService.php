@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 class PostService extends BaseService
 {
     protected $cacheService;
+
     protected $logService;
 
     public function __construct(Post $post, CacheService $cacheService, LogService $logService)
@@ -27,8 +28,9 @@ class PostService extends BaseService
         $cacheKey = $this->cacheService->generateCacheKey('Post', $filters);
         $posts = $this->cacheService->get($cacheKey);
 
-        if (!$posts) {
+        if (! $posts) {
             $query = $this->model
+                ->with(['user', 'comments'])
                 ->hasManyComments($filters['commentCount'] ?? false)
                 ->AuthorIdGreaterThan($filters['authorId'] ?? false);
 

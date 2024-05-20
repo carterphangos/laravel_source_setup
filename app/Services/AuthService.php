@@ -37,7 +37,7 @@ class AuthService
         $accessToken = $user->createToken('Access Token', [TokenAbilities::ACCESS_TOKEN], Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken;
         $refreshToken = null;
 
-        if ($request->has('remember')) {
+        if ($request->boolean('remember')) {
             $refreshToken = $user->createToken('Refresh Token', [TokenAbilities::REFRESH_TOKEN], Carbon::now()->addMinutes(config('sanctum.rt_expiration')))->plainTextToken;
         }
 

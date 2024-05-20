@@ -1,8 +1,8 @@
 <?php
 
+use App\Console\Commands\SyncDatabaseToCache;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
-use App\Console\Commands\SyncDatabaseToCache;
 use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {

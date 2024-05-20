@@ -8,7 +8,7 @@ use BenSampo\Enum\Enum;
 
 final class BaseColumn extends Enum
 {
-    const COLUMN_CREATED = "created_at";
+    const COLUMN_CREATED = 'created_at';
 
-    const COLUMN_UPDATED = "updated_at";
+    const COLUMN_UPDATED = 'updated_at';
 }
