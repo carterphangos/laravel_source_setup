@@ -44,8 +44,14 @@
 
 ![alt text](image.png)
 
-This project is a simple laravel project that helps you setup the laravel application and docker container for your project. It wil help you save a lot of time to setup the docker laravel and other environment. 
+This project is a RESTful API built with Laravel, utilizing Redis for caching and MySQL for data storage. It demonstrates how to create a scalable and performant backend API using Laravel framework while integrating Redis for caching to improve response times.
 
+## Features
+Laravel Framework: A PHP framework for building web applications with expressive syntax and conventions.
+
+Redis: An open-source, in-memory data structure store, used as a cache to improve the performance of API responses.
+
+MySQL: A popular relational database management system used for storing and retrieving data.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -63,27 +69,65 @@ This project is a simple laravel project that helps you setup the laravel applic
 
 <!-- GETTING STARTED -->
 ## Getting Started
+Before you begin, ensure you have  a docker to run the application successfully or you will have the following installed:
 
-You need to have a docker to run the application successfully
-otherwise you will have to download the environment configuration such as php8.3, mysql, apache, etc
+PHP (https://www.php.net/) (php8.3)
+
+Composer (https://getcomposer.org/)
+
+MySQL (https://www.mysql.com/)
+
+Redis (https://redis.io/)
 
 
 ### Installation
 
 1. Clone the repo
-   ```sh
-   git clone https://github.com/carterphangos/laravel_source_setup.git
-   ```
-2. Run the following command
-   ```sh
-   docker-compose up -d --build
-   ```
+```sh
+git clone https://github.com/carterphangos/laravel_source_setup.git
+cd laravel_source_setup
+```
+2. Set up environment variables
+    
+Copy the .env.example file to .env:
+
+```sh
+cp .env.example .env
+```
+
+Update the database and Redis configurations in the .env file with your local settings:
+
+```sh
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1 || host.docker.internal
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=your_database_username
+DB_PASSWORD=your_database_password
+
+REDIS_HOST=127.0.0.1 || host.docker.internal
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+```
+
+3. Run the following command
+```sh
+docker-compose up -d --build
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- USAGE EXAMPLES -->
+## USAGE
+
+Use the provided API endpoints to perform CRUD operations on your data.
+
+Utilize Redis caching to improve the performance of frequently accessed data.
+
+Customize and extend the API as needed for your project requirements.
+
 
 
 <!-- CONTRIBUTING -->
