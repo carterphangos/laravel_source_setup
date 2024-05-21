@@ -25,10 +25,13 @@ class ResetPassword extends Mailable
 
     public function build()
     {
+        $frontendUrl = config('app.frontend_url');
+        $resetLink = $frontendUrl.'reset-password?token='.$this->token;
+
         return $this->subject('Password Reset')
             ->view('emails.reset')
             ->with([
-                'resetLink' => route('password.create', $this->token),
+                'resetLink' => $resetLink,
                 'expiresAt' => $this->expiresAt->format('H:i, d M Y'),
             ]);
     }

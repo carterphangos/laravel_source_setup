@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BaseLimit;
 use App\Http\Requests\UpdatePostRequest;
 use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
-use App\Enums\BaseLimit;
 
 class PostController extends Controller
 {
@@ -41,7 +41,7 @@ class PostController extends Controller
 
         $validatedData['user_id'] = 1;
 
-        $this->postService->create($validatedData);
+        $this->postService->createPost($validatedData);
 
         return redirect()->route('posts.index');
     }
@@ -85,5 +85,5 @@ class PostController extends Controller
             'status' => true,
             'message' => 'Post Deleted Successfully',
         ], Response::HTTP_OK);
-    }   
+    }
 }

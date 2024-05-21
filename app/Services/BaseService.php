@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
+use App\Enums\BaseColumn;
+use App\Enums\BaseSort;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
-use App\Enums\BaseColumn;
-use App\Enums\BaseSort;
-use App\Enums\BaseLimit;
 
 class BaseService
 {
@@ -18,7 +17,7 @@ class BaseService
         $this->model = $model;
     }
 
-    public function getAll($perPage = BaseLimit::LIMIT_10, $query, $filters = [], $columnSearch = null, $termSearch = null): Paginator
+    public function getAll($perPage, $query, $filters = [], $columnSearch = null, $termSearch = null): Paginator
     {
         $sortColumn = $filters['sortColumn'] ?? BaseColumn::COLUMN_CREATED;
         $sortOrder = $filters['sortOrder'] ?? BaseSort::ORDER_DESC;

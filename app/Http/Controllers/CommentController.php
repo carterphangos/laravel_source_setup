@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BaseLimit;
+use App\Events\NewCommentEvent;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Services\CommentService;
 use Illuminate\Http\Request;
-use App\Enums\BaseLimit;
-use App\Events\NewCommentEvent;
 use Illuminate\Http\Response;
 
 class CommentController extends Controller
@@ -37,11 +37,10 @@ class CommentController extends Controller
         $validatedData = $request->validate([
             'content' => 'required',
             'post_id' => 'required',
+            'user_id' => 'required',
         ]);
 
-        $validatedData['user_id'] = 1;
-
-        $comment = $this->commentService->create($validatedData);
+        $comment = $this->commentService->createComment($validatedData);
 
         event(new NewCommentEvent($comment));
 

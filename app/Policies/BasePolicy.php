@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Enums\UserRoles;
+use App\Models\User;
 
 class BasePolicy
 {

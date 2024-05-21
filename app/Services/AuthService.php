@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthService
 {
@@ -28,7 +29,7 @@ class AuthService
 
     public function loginUser(Request $request)
     {
-        if (! Auth::attempt($request->only(['email', 'password']))) {
+        if (!Auth::attempt($request->only(['email', 'password']))) {
             return null;
         }
 
@@ -37,7 +38,7 @@ class AuthService
         $accessToken = $user->createToken('Access Token', [TokenAbilities::ACCESS_TOKEN], Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken;
         $refreshToken = null;
 
-        if ($request->has('remember')) {
+        if ($request->boolean('remember')) {
             $refreshToken = $user->createToken('Refresh Token', [TokenAbilities::REFRESH_TOKEN], Carbon::now()->addMinutes(config('sanctum.rt_expiration')))->plainTextToken;
         }
 
@@ -133,5 +134,47 @@ class AuthService
         }
 
         return false;
+    }
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
+            $user = $this->findOrCreateUser($googleUser);
+
+            Auth::login($user);
+
+            return [
+                'status' => true,
+                'message' => 'User Logged In Successfully',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => 'An error occurred during Google login.',
+            ];
+        }
+    }
+
+    private function findOrCreateUser($googleUser)
+    {
+        $existingUser = User::where('google_id', $googleUser->getId())->first();
+        if ($existingUser) {
+            return $existingUser;
+        }
+        $name = $googleUser->getName();
+        $email =  $googleUser->getEmail();
+        $id = $googleUser->getId();
+        return User::create([
+            'name' => $googleUser->getName(),
+            'email' => $googleUser->getEmail(),
+            'google_id' => $googleUser->getId(),
+        ]);
     }
 }

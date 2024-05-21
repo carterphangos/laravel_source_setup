@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Enums\BaseLimit;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Post;
-use App\Models\Comment;
 
 class CacheService
 {
@@ -34,7 +32,7 @@ class CacheService
 
         $parts = [];
         foreach ($filters as $filterKey => $filterValue) {
-            $parts[] = ucfirst($filterKey) . ':' . $filterValue;
+            $parts[] = ucfirst($filterKey).':'.$filterValue;
         }
 
         return implode('-', $parts);
@@ -42,7 +40,7 @@ class CacheService
 
     public function generateCacheKey($key, $filters)
     {
-        return $key . '-' . $this->formatCacheKey($filters);
+        return $key.'-'.$this->formatCacheKey($filters);
     }
 
     public function syncCache($model)
@@ -54,7 +52,7 @@ class CacheService
         $totalPages = $model::paginate(BaseLimit::LIMIT_10)->lastPage();
 
         for ($page = 1; $page <= $totalPages; $page++) {
-            $pageCacheKey = $name . '-Page:' . $page;
+            $pageCacheKey = $name.'-Page:'.$page;
 
             $pageData = $model::paginate(BaseLimit::LIMIT_10, ['*'], 'page', $page);
 

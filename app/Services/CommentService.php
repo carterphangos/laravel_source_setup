@@ -10,7 +10,7 @@ class CommentService extends BaseService
 {
     protected $cacheService;
 
-    public function __construct(Comment $comment,  CacheService $cacheService)
+    public function __construct(Comment $comment, CacheService $cacheService)
     {
         parent::__construct($comment);
         $this->cacheService = $cacheService;
@@ -21,20 +21,29 @@ class CommentService extends BaseService
         $cacheKey = $this->cacheService->generateCacheKey('Comment', $filters);
         $comments = $this->cacheService->get($cacheKey);
 
-        if(!$comments){
+        if (! $comments) {
 
             $query = $this->model
-            ->PostIdGreaterThan($filters['postId'] ?? false)
-            ->AuthorIdGreaterThan($filters['authorId'] ?? false);
-            
+                ->PostIdGreaterThan($filters['postId'] ?? false)
+                ->AuthorIdGreaterThan($filters['authorId'] ?? false);
+
             $columnSearch = [CommentColumns::Title];
-            
+
             $comments = $this->getAll($perPage, $query, $filters, $columnSearch, $filters['termSearch'] ?? null);
-            
+
             $this->cacheService->put($cacheKey, $comments, now()->addMinutes(5));
         }
 
         return $comments;
+    }
+
+    public function createComment(array $data)
+    {
+        $comment = $this->create($data);
+
+        $this->cacheService->syncCache($comment);
+
+        return $comment;
     }
 
     public function updateComment($id, array $data)

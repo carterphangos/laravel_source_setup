@@ -24,11 +24,11 @@ class LogService
     protected function getLogChannel(string $path): string
     {
         $filename = basename($path, '.log');
-        $channel = 'custom_' . $filename;
+        $channel = 'custom_'.$filename;
 
         if (! config()->has("logging.channels.{$channel}")) {
 
-            $logPath = storage_path('logs/' . basename($path));
+            $logPath = storage_path('logs/'.basename($path));
 
             config([
                 "logging.channels.{$channel}" => [
@@ -39,6 +39,6 @@ class LogService
             ]);
         }
 
-        return 'custom_' . $filename;
+        return 'custom_'.$filename;
     }
 }
