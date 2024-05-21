@@ -37,6 +37,15 @@ class CommentService extends BaseService
         return $comments;
     }
 
+    public function createComment(array $data)
+    {
+        $comment = $this->create($data);
+
+        $this->cacheService->syncCache($comment);
+
+        return $comment;
+    }
+
     public function updateComment($id, array $data)
     {
         $comment = $this->update($id, $data);

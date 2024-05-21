@@ -28,9 +28,9 @@ class PostService extends BaseService
         $cacheKey = $this->cacheService->generateCacheKey('Post', $filters);
         $posts = $this->cacheService->get($cacheKey);
 
-        if (! $posts) {
+        if (!$posts) {
             $query = $this->model
-                ->with(['user', 'comments'])
+                ->with(['user', 'comments', 'comments.user'])
                 ->hasManyComments($filters['commentCount'] ?? false)
                 ->AuthorIdGreaterThan($filters['authorId'] ?? false);
 
@@ -45,6 +45,15 @@ class PostService extends BaseService
         }
 
         return $posts;
+    }
+
+    public function createPost(array $data)
+    {
+        $post = $this->create($data);
+
+        $this->cacheService->syncCache($post);
+
+        return $post;
     }
 
     public function updatePost($id, array $data)

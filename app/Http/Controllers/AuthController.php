@@ -34,7 +34,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->loginUser($request);
 
-        if (! $result) {
+        if (!$result) {
             return response()->json([
                 'status' => false,
                 'message' => 'Email & Password does not match with our record.',
@@ -63,7 +63,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->refreshToken($request);
 
-        if (! $result) {
+        if (!$result) {
             return response()->json([
                 'status' => false,
                 'message' => 'Your refresh token is invalid or has expired.',
@@ -130,5 +130,17 @@ class AuthController extends Controller
             'status' => false,
             'message' => 'This password reset token is invalid or has expired.',
         ], Response::HTTP_NOT_FOUND);
+    }
+
+    public function redirectToGoogle()
+    {
+        return $this->authService->redirectToGoogle();
+    }
+
+    public function handleGoogleCallback()
+    {
+        $result = $this->authService->handleGoogleCallback();
+
+        return response()->json($result, $result['status'] ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
     }
 }

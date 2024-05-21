@@ -41,7 +41,7 @@ class PostController extends Controller
 
         $validatedData['user_id'] = 1;
 
-        $this->postService->create($validatedData);
+        $this->postService->createPost($validatedData);
 
         return redirect()->route('posts.index');
     }
