@@ -6,13 +6,23 @@ use App\Models\User;
 
 class UserPolicy extends BasePolicy
 {
-    public function update(User $user, User $model)
+    public function getAll(User $user)
     {
-        return $this->isAdmin($user) || $this->owns($user, $model);
+        return $this->isAdmin($user);
     }
 
-    public function delete(User $user, User $model)
+    public function create(User $user)
     {
-        return $this->isAdmin($user) || $this->owns($user, $model);
+        return $this->isAdmin($user);
+    }
+
+    public function update(User $user)
+    {
+        return $this->isAdmin($user);
+    }
+
+    public function delete(User $user)
+    {
+        return $this->isAdmin($user);
     }
 }

@@ -6,7 +6,7 @@ use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendEmailRequest;
-use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\UpdateUserPasswordRequest;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -34,7 +34,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->loginUser($request);
 
-        if (!$result) {
+        if (! $result) {
             return response()->json([
                 'status' => false,
                 'message' => 'Email & Password does not match with our record.',
@@ -44,6 +44,9 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User Logged In Successfully',
+            'user_id' => $result['user_id'],
+            'user_name' => $result['user_name'],
+            'user_role' => $result['user_role'],
             'access_token' => $result['access_token'],
             'refresh_token' => $result['refresh_token'],
         ], Response::HTTP_OK);
@@ -63,7 +66,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->refreshToken($request);
 
-        if (!$result) {
+        if (! $result) {
             return response()->json([
                 'status' => false,
                 'message' => 'Your refresh token is invalid or has expired.',
@@ -78,7 +81,7 @@ class AuthController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function update(UpdateUserRequest $request)
+    public function update(UpdateUserPasswordRequest $request)
     {
         $this->authService->updatePasswordUser($request);
 
@@ -141,6 +144,16 @@ class AuthController extends Controller
     {
         $result = $this->authService->handleGoogleCallback();
 
-        return response()->json($result, $result['status'] ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
+        if ($result['status']) {
+
+            $redirectUrl = config('app.frontend_url').'/login?'.http_build_query($result);
+
+            return redirect($redirectUrl);
+        }
+
+        return response()->json([
+            'status' => $result['status'],
+            'message' => $result['message'],
+        ], Response::HTTP_UNAUTHORIZED);
     }
 }

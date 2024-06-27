@@ -2,39 +2,35 @@
 
 namespace App\Events;
 
-use App\Models\Comment;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NewCommentEvent implements ShouldBroadcastNow
+class ImportantAnnouncementCreated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $postName;
+    public $message;
 
-    public $authorName;
+    public $userId;
 
-    public $content;
-
-    public function __construct(Comment $comment)
+    public function __construct(string $message, string $userId)
     {
-        $this->postName = $comment->post->title;
-        $this->authorName = $comment->user->name;
-        $this->content = $comment->content;
+        $this->message = $message;
+        $this->userId = $userId;
     }
 
     public function broadcastOn(): array
     {
         return [
-            new Channel('comments'),
+            new Channel('go-news'),
         ];
     }
 
     public function broadcastAs()
     {
-        return 'new-comment';
+        return 'new-important';
     }
 }

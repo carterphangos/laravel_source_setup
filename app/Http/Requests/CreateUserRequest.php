@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-class RegisterUserRequest extends FormRequest
+class CreateUserRequest extends FormRequest
 {
     protected function prepareForValidation()
     {

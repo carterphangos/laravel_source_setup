@@ -3,26 +3,25 @@
 namespace App\Services;
 
 use App\Enums\BaseColumn;
+use App\Enums\BaseLimit;
 use App\Enums\BaseSort;
-use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Gate;
 
 class BaseService
 {
     protected $model;
 
-    public function __construct(Model $model)
+    protected $cacheService;
+
+    public function __construct(Model $model, CacheService $cacheService)
     {
         $this->model = $model;
+        $this->cacheService = $cacheService;
     }
 
-    public function getAll($perPage, $query, $filters = [], $columnSearch = null, $termSearch = null): Paginator
+    public function getAll($perPage = null, $filters = [], $query = null, $columnSearch = null, $termSearch = null)
     {
-        $sortColumn = $filters['sortColumn'] ?? BaseColumn::COLUMN_CREATED;
-        $sortOrder = $filters['sortOrder'] ?? BaseSort::ORDER_DESC;
-
-        $query->orderBy($sortColumn, $sortOrder);
+        $query = $query ?: $this->model->newQuery();
 
         if ($termSearch && is_array($columnSearch)) {
             $query->where(function ($subQuery) use ($columnSearch, $termSearch) {
@@ -32,38 +31,127 @@ class BaseService
             });
         }
 
-        return $query->paginate($perPage);
+        $sortColumn = $filters['sortColumn'] ?? BaseColumn::COLUMN_CREATED;
+        $sortOrder = $filters['sortOrder'] ?? BaseSort::ORDER_DESC;
+
+        $query->orderBy($sortColumn, $sortOrder);
+
+        return $perPage ? $query->paginate($perPage) : $query->get();
     }
 
-    public function getById($id)
+    public function getCachedData($perPage, $filters = [], $relations = [], $columnSearch = [], $termSearch = null, $query = null)
     {
-        return $this->model->findOrFail($id);
+        if (is_null($perPage)) {
+            return $this->getAll($perPage, $filters, $query, $columnSearch, $termSearch);
+        }
+
+        if ($this->hasFilters($filters)) {
+            return $this->fetchAndCacheData($perPage, $filters, $relations, $columnSearch, $termSearch, $cacheKey = null, $query);
+        }
+
+        $cacheKey = $this->cacheService->generateCacheKey(class_basename($this->model), $filters);
+        $data = $this->cacheService->get($cacheKey);
+
+        if (!$data) {
+            $data = $this->fetchAndCacheData($perPage, $filters, $relations, $columnSearch, $termSearch, $cacheKey);
+        }
+
+        return $data;
     }
 
-    public function create(array $data)
+    private function fetchAndCacheData($perPage, $filters, $relations, $columnSearch, $termSearch, $cacheKey = null, $query = null)
     {
-        return $this->model->create($data);
+        $query = $query ?: $this->model->newQuery();
+
+        $query->with($relations);
+
+        $data = $this->getAll($perPage, $filters, $query, $columnSearch, $termSearch);
+
+        if ($cacheKey) {
+            $this->cacheService->put($cacheKey, $data, now()->addMinutes(5));
+        }
+
+        return $data;
     }
 
-    public function update($id, array $data)
+    private function hasFilters($filters): bool
     {
-        $model = $this->model->findOrFail($id);
+        $filterKeys = array_keys($filters);
 
-        Gate::authorize('update', $model);
-
-        $model->update($data);
-
-        return $model;
+        return count($filterKeys) > 1 || (count($filterKeys) === 1 && $filterKeys[0] !== 'page');
     }
 
-    public function delete($id)
+    public function getById($id, array $with = [])
     {
-        $model = $this->model->findOrFail($id);
+        $finded = $this->model->with($with)->findOrFail($id);
 
-        Gate::authorize('delete', $model);
+        return $finded;
+    }
 
-        $model->delete();
+    public function create(array $data, array $with = [])
+    {
+        $created = $this->model->create($data);
 
-        return $model;
+        $this->syncCache($with);
+
+        return $created;
+    }
+
+    public function createMany(array $data, array $with = [])
+    {
+        $this->model->insert($data);
+
+        $createds = $this->model->latest()->limit(count($data))->get();
+
+        return $createds;
+    }
+
+    public function update($id, array $data, array $with = [])
+    {
+        $finded = $this->model->findOrFail($id);
+        $updated = $finded->update($data);
+
+        $this->syncCache($with);
+
+        return $updated;
+    }
+
+    public function delete($id, array $with = [])
+    {
+        $finded = $this->model->findOrFail($id);
+        $deleted = $finded->delete();
+
+        $this->syncCache($with);
+
+        return $deleted;
+    }
+
+    public function getDataToSync(array $with = [], $page = 1)
+    {
+        $query = $this->model->newQuery();
+
+        if (!empty($with)) {
+            $query->with($with);
+        }
+
+        $query->orderBy(BaseColumn::COLUMN_CREATED, BaseSort::ORDER_DESC);
+
+        return $query->paginate(BaseLimit::LIMIT_10, ['*'], 'page', $page);
+    }
+
+    protected function syncCache(array $with = [])
+    {
+        $modelName = class_basename($this->model);
+        $page = 1;
+        while (true) {
+            $data = $this->getDataToSync($with, $page);
+            $key = $this->cacheService->generateCacheKey($modelName, ['page' => $page]);
+            $this->cacheService->syncCache($key, $data);
+
+            if (!$data->hasMorePages()) {
+                break;
+            }
+            $page++;
+        }
     }
 }

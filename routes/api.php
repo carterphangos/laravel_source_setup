@@ -1,54 +1,46 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\CategoryController;
 
 Route::controller(AuthController::class)->prefix('auth')->group(function () {
-    Route::post('/register', 'register')->name('auth.register');
     Route::post('/login', 'login')->name('auth.login');
-    Route::post('/forgot-password', 'send')->name('password.email');
-    Route::post('/reset-password', 'reset')->name('password.reset');
-});
-
-Route::middleware(['auth:sanctum', 'ability:access-token'])->group(function () {
-    Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+    Route::post('/register', 'register')->name('auth.register');
+    Route::post('/forgot-password', 'send')->name('auth.email');
+    Route::post('/reset-password', 'reset')->name('auth.reset');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(AuthController::class)->prefix('auth')->group(function () {
-        Route::post('/update', 'update');
+        Route::post('/update', 'update')->name('auth.update');
         Route::post('/logout', 'logout')->name('auth.logout');
+        Route::post('/refresh', 'refresh')->name('auth.refresh')->middleware('ability:access-token');
     });
-});
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::controller(PostController::class)->prefix('posts')->group(function () {
-        Route::get('/', 'index')->name('posts.index');
-        Route::post('/', 'store')->name('posts.store');
-        Route::get('/{id}', 'show')->name('posts.show');
-        Route::get('/{id}/edit', 'edit')->name('posts.edit');
-        Route::put('/{id}', 'update')->name('posts.update');
-        Route::delete('/{id}', 'destroy')->name('posts.destroy');
+    Route::controller(UserController::class)->prefix('users')->group(function () {
+        Route::post('/{id}', 'update')->name('user.update');
+        Route::put('/password', 'updatePassword')->name('user.password');
     });
-    Route::controller(CommentController::class)->prefix('comments')->group(function () {
-        Route::get('/', 'index')->name('comments.index');
-        Route::post('/', 'store')->name('comments.store');
-        Route::put('/{id}', 'update')->name('comments.update');
-        Route::delete('/{id}', 'destroy')->name('comments.destroy');
+    Route::apiResource('users', UserController::class)->except(['update']);
+
+    Route::apiResource('announcements', AnnouncementController::class);
+
+    Route::apiResource('categories', CategoryController::class);
+
+    Route::controller(TrackingController::class)->prefix('trackings')->group(function () {
+        Route::post('/', 'store')->name('track.store');
+        Route::get('/check/{id}', 'check')->name('track.check');
+        Route::get('/daily-stats', 'dailyStats')->name('track.daily-stats');
+        Route::get('/announ-stats', 'announStats')->name('track.announ-stats');
     });
-    Route::controller(CourseController::class)->prefix('courses')->group(function () {
-        Route::get('/', 'index')->name('course.index');
-        Route::post('/', 'store')->name('course.store');
-        Route::get('/{id}', 'show')->name('course.show');
-        Route::get('/{id}/edit', 'edit')->name('courses.edit');
-        Route::put('/{id}', 'update')->name('courses.update');
-        Route::delete('/{id}', 'destroy')->name('courses.destroy');
+
+    Route::controller(NotificationController::class)->prefix('notifications')->group(function () {
+        Route::put('/all/{id}', 'updateAll')->name('notifications.updateAll');
     });
-    Route::prefix('users')->group(function () {
-        Route::get('/{id}', [UserController::class, 'show'])->name('users.show');
-    });
+    Route::apiResource('notifications', NotificationController::class)->except(['index', 'show', 'store']);
 });

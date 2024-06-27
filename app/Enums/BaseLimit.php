@@ -11,4 +11,6 @@ final class BaseLimit extends Enum
     const LIMIT_10 = 10;
 
     const LIMIT_15 = 15;
+    
+    const LIMIT_20 = 20;
 }

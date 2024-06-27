@@ -6,7 +6,7 @@ namespace App\Enums;
 
 use BenSampo\Enum\Enum;
 
-final class PostColumns extends Enum
+final class AnnouncementColumns extends Enum
 {
     const Title = 'title';
 

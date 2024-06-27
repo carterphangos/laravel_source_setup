@@ -29,7 +29,7 @@ class AuthService
 
     public function loginUser(Request $request)
     {
-        if (!Auth::attempt($request->only(['email', 'password']))) {
+        if (! Auth::attempt($request->only(['email', 'password']))) {
             return null;
         }
 
@@ -43,6 +43,9 @@ class AuthService
         }
 
         return [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'user_role' => $user->role,
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
         ];
@@ -147,12 +150,17 @@ class AuthService
             $googleUser = Socialite::driver('google')->stateless()->user();
 
             $user = $this->findOrCreateUser($googleUser);
+            $accessToken = $user->createToken('Access Token', [TokenAbilities::ACCESS_TOKEN], Carbon::now()->addMinutes(config('sanctum.at_expiration')))->plainTextToken;
 
             Auth::login($user);
 
             return [
                 'status' => true,
                 'message' => 'User Logged In Successfully',
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'user_role' => $user->role,
+                'access_token' => $accessToken,
             ];
         } catch (\Exception $e) {
             return [
@@ -168,13 +176,12 @@ class AuthService
         if ($existingUser) {
             return $existingUser;
         }
-        $name = $googleUser->getName();
-        $email =  $googleUser->getEmail();
-        $id = $googleUser->getId();
+
         return User::create([
             'name' => $googleUser->getName(),
             'email' => $googleUser->getEmail(),
             'google_id' => $googleUser->getId(),
+            'avatar' => $googleUser->getAvatar(),
         ]);
     }
 }

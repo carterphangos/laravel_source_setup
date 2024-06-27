@@ -6,14 +6,14 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateUserRequest extends FormRequest
+class UpdateUserPasswordAdminRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'name' => 'nullable',
-            'birthday' => 'nullable|date',
-            'avatar' => 'nullable',
+            'user_id' => ['required', 'exists:users,id'],
+            'new_password' => 'required|confirmed|min:8',
+            'new_password_confirmation' => 'required',
         ];
     }
 

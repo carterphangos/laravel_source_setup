@@ -2,6 +2,6 @@
 
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('comment', function () {
+Broadcast::channel('go-news', function () {
     return true;
 });

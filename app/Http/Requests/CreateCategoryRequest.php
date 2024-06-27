@@ -2,21 +2,21 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
+use App\Models\Category;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-class RegisterUserRequest extends FormRequest
+class CreateCategoryRequest extends FormRequest
 {
     protected function prepareForValidation()
     {
-        if ($this->email) {
-            $user = User::withTrashed()->where('email', $this->email)->first();
-            if ($user) {
-                if ($user->trashed()) {
-                    $user->forceDelete();
+        if ($this->name) {
+            $category = Category::withTrashed()->where('name', $this->name)->first();
+            if ($category) {
+                if ($category->trashed()) {
+                    $category->forceDelete();
                 }
             }
         }
@@ -25,13 +25,10 @@ class RegisterUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required',
-            'email' => [
+            'name' => [
                 'required',
-                'email',
-                Rule::unique('users', 'email')->whereNull('deleted_at'),
+                Rule::unique('categories', 'name')->whereNull('deleted_at'),
             ],
-            'password' => 'required',
         ];
     }
 

@@ -6,7 +6,7 @@ namespace App\Enums;
 
 use BenSampo\Enum\Enum;
 
-final class CommentColumns extends Enum
+final class CategoryColumns extends Enum
 {
-    const Title = 'title';
+    const Name = 'name';
 }

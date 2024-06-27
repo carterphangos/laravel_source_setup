@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\BaseColumn;
 use App\Enums\BaseLimit;
+use App\Enums\BaseSort;
 use Illuminate\Support\Facades\Cache;
 
 class CacheService
@@ -20,6 +22,11 @@ class CacheService
     public function forget($key)
     {
         Cache::forget($key);
+    }
+
+    public function flushAll(string $key)
+    {
+        Cache::tags($key)->flush();
     }
 
     public function formatCacheKey($filters)
@@ -43,20 +50,32 @@ class CacheService
         return $key.'-'.$this->formatCacheKey($filters);
     }
 
-    public function syncCache($model)
+    public function syncCache($key, $data)
     {
-        $name = class_basename($model);
+        $this->forget($key);
 
-        $this->forget($name);
+        $this->put($key, $data, now()->addMinutes(5));
+    }
 
-        $totalPages = $model::paginate(BaseLimit::LIMIT_10)->lastPage();
+    public function syncModelData($modelClass, $with = [])
+    {
+        $model = new $modelClass;
+        $modelName = class_basename($model);
+        $page = 1;
 
-        for ($page = 1; $page <= $totalPages; $page++) {
-            $pageCacheKey = $name.'-Page:'.$page;
+        while (true) {
+            $query = $model->newQuery()->with($with);
+            $data = $query->orderBy(BaseColumn::COLUMN_CREATED, BaseSort::ORDER_DESC)->paginate(BaseLimit::LIMIT_10, ['*'], 'page', $page);
 
-            $pageData = $model::paginate(BaseLimit::LIMIT_10, ['*'], 'page', $page);
+            $filters = ['page' => $page];
+            $key = $this->generateCacheKey($modelName, $filters);
 
-            $this->put($pageCacheKey, $pageData, now()->addMinutes(5));
+            $this->put($key, $data, now()->addMinutes(5));
+
+            if (! $data->hasMorePages()) {
+                break;
+            }
+            $page++;
         }
     }
 }

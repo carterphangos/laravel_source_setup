@@ -6,14 +6,13 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateUserRequest extends FormRequest
+class CreateAnnouncementRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'name' => 'nullable',
-            'birthday' => 'nullable|date',
-            'avatar' => 'nullable',
+            'title' => 'required|max:255',
+            'content' => 'required',
         ];
     }
 
